@@ -1,2 +1,2 @@
 # ransomcoin
-Extracting metadata (including bitcoin addresses) from ransomware
+Extracting metadata (including cryptocoin addresses) from ransomware
