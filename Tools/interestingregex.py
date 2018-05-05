@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#!/usr/bin/env python
 # Copyright 2018 Eireann Leverett of Concinnity Risks
 #
 # This program is free software: you can redistribute it and/or modify
@@ -31,14 +31,32 @@ def process(stream):
     data = stream.read()
     return pattern.findall(data)
 
-    for found_str in process(sys.stdin):
-        print found_str
-
 file = "testransomware"
 accountnos = []
 
-btc = re.compile("^5[HJK][1-9A-Za-z][^OIl]{48}$")
+#Crypto currency addresses and pay ids
+btc = re.compile("5[HJK][1-9A-Za-z][^OIl]{48}$")
+bch = re.compile("(^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$)|(^(bitcoincash:)?(q|p)[a-z0-9]{41}$)|(^(BITCOINCASH:)?(Q|P)[A-Z0-9]{41}$)")
+xmr = re.compile("^4[0-9AB][1-9A-HJ-NP-Za-km-z]{93}$")
+xmrpayid = re.compile("^[0-9a-fA-F]{16}|[0-9a-fA-F]{64}$")
+#Onion addresses
+onion = re.compile("(?:https?://)?(?:www)?(\S*?\.onion)\b")
 with open(file) as f:
     for line in process(f):
         if btc.search(line):
+            print "Bitcoin Address Found"
             print line
+        elif  bch.search(line):
+            print "Bitcoin Cash Address Found"
+            print line
+        elif  xmr.search(line):
+            print "Monero Address Found"
+            print line
+        elif xmrpayid.search(line):
+            print "Monero Pay ID Found"
+            print line
+        elif onion.search(line):
+            print "Onion Address Found"
+            print line
+        else:
+            pass
