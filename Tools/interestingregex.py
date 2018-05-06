@@ -41,6 +41,8 @@ xmr = re.compile("^4[0-9AB][1-9A-HJ-NP-Za-km-z]{93}$")
 xmrpayid = re.compile("^[0-9a-fA-F]{16}|[0-9a-fA-F]{64}$")
 #Onion addresses
 onion = re.compile("(?:https?://)?(?:www)?(\S*?\.onion)\b")
+#email
+email = re.compile("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")
 with open(file) as f:
     for line in process(f):
         if btc.search(line):
@@ -55,6 +57,9 @@ with open(file) as f:
         elif xmrpayid.search(line):
             print "Monero Pay ID Found"
             print line
+        elif email.search(line):
+                print "Email Address Found"
+                print line
         elif onion.search(line):
             print "Onion Address Found"
             print line
