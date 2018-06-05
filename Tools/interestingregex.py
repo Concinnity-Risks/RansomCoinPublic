@@ -17,7 +17,8 @@
 # File name interestingregex.py
 # written by eireann.leverett@cantab.net
 
-import os.path
+from tqdm import *
+import os
 import sys
 import re
 
@@ -31,7 +32,7 @@ def process(stream):
     data = stream.read()
     return pattern.findall(data)
 
-file = "testransomware"
+#file = "testransomware"
 accountnos = []
 
 #Crypto currency addresses and pay ids
@@ -43,27 +44,30 @@ xmrpayid = re.compile("[0-9a-fA-F]{16}|[0-9a-fA-F]{64}")
 onion = re.compile("(?:https?://)|(?:http?://)?(?:www)?(\S*?\.onion)\b")
 #email
 email = re.compile("[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+")
-with open(file) as f:
-    for line in process(f):
-        if btc.search(line):
-            print "Bitcoin Address Found"
-            print line
-        elif  xmr.search(line):
-            print "Monero Address Found"
-            print line
-        elif email.search(line):
-            print "Email Address Found"
-            print line
-        elif onion.search(line):
-            print "Onion Address Found"
-            print line
-        #This one needs to be near the bottom, as it matches shorter base58 strings
-        elif  bch.search(line):
-            print "Bitcoin Cash Address Found"
-            print line
-        #This one needs to be last, as it basically matches domains and emails
-        elif xmrpayid.search(line):
-            print "Monero Pay ID Found"
-            print line
-        else:
-            pass
+
+for filename in tqdm(os.listdir(os.getcwd())):
+    with open(filename) as f:
+        for line in tqdm(process(f)):
+            if btc.search(line):
+                print "Bitcoin Address Found"
+                print line
+            elif  xmr.search(line):
+                print "Monero Address Found"
+                print line
+            elif email.search(line):
+                print "Email Address Found"
+                print line
+            elif onion.search(line):
+                print "Onion Address Found"
+                print line
+            #This one needs to be near the bottom, as it matches shorter base58 strings
+            elif  bch.search(line):
+                print "Bitcoin Cash Address Found"
+                print line
+            #This one needs to be last, as it basically matches domains and emails
+            elif xmrpayid.search(line):
+                print "Monero Pay ID Found"
+                print line
+            else:
+                pass
+    f.close()
