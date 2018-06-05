@@ -21,6 +21,9 @@ from tqdm import *
 import os
 import sys
 import re
+import csv
+
+#Useful Functions
 
 chars = r"A-Za-z0-9/\-:.,_$%'()[\]<> "
 shortest_run = 4
@@ -32,8 +35,7 @@ def process(stream):
     data = stream.read()
     return pattern.findall(data)
 
-#file = "testransomware"
-accountnos = []
+#Section for regexes we're interested in
 
 #Crypto currency addresses and pay ids
 btc = re.compile("5[HJK][1-9A-Za-z][^OIl]{48}")
@@ -45,29 +47,27 @@ onion = re.compile("(?:https?://)|(?:http?://)?(?:www)?(\S*?\.onion)\b")
 #email
 email = re.compile("[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+")
 
-for filename in tqdm(os.listdir(os.getcwd())):
-    with open(filename) as f:
-        for line in tqdm(process(f)):
-            if btc.search(line):
-                print "Bitcoin Address Found"
-                print line
-            elif  xmr.search(line):
-                print "Monero Address Found"
-                print line
-            elif email.search(line):
-                print "Email Address Found"
-                print line
-            elif onion.search(line):
-                print "Onion Address Found"
-                print line
-            #This one needs to be near the bottom, as it matches shorter base58 strings
-            elif  bch.search(line):
-                print "Bitcoin Cash Address Found"
-                print line
-            #This one needs to be last, as it basically matches domains and emails
-            elif xmrpayid.search(line):
-                print "Monero Pay ID Found"
-                print line
-            else:
-                pass
-    f.close()
+#The main body of code
+with open('Ransomware.csv', 'wb') as csvfile:
+    resultswriter = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+    for filename in tqdm(os.listdir(os.getcwd())):
+        with open(filename) as f:
+            for line in tqdm(process(f)):
+                if btc.search(line):
+                    resultswriter.writerow([filename,"Bitcoin Address",line])
+                elif  xmr.search(line):
+                    resultswriter.writerow([filename,"Monero Address",line])
+                elif email.search(line):
+                    resultswriter.writerow([filename,"Email Address",line])
+                elif onion.search(line):
+                    resultswriter.writerow([filename,"Onion Address",line])
+                #This one needs to be near the bottom, as it matches shorter base58 strings
+                elif  bch.search(line):
+                    resultswriter.writerow([filename,"Bitcoin Cash Address",line])
+                #This one needs to be last, as it basically matches domains and emails
+                elif xmrpayid.search(line):
+                    resultswriter.writerow([filename,"Monero Pay ID",line])
+                else:
+                    pass
+        f.close()
+csvfile.close()
