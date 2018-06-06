@@ -37,13 +37,16 @@ def process(stream):
 
 #Section for regexes we're interested in
 
+#URLs
+url = re.compile("http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+")
+
 #Crypto currency addresses and pay ids
 btc = re.compile("5[HJK][1-9A-Za-z][^OIl]{48}")
 bch = re.compile("([13][a-km-zA-HJ-NP-Z1-9]{25,34})|((bitcoincash:)?(q|p)[a-z0-9]{41})|((BITCOINCASH:)?(Q|P)[A-Z0-9]{41})")
 xmr = re.compile("4[0-9AB][1-9A-HJ-NP-Za-km-z]{93}")
 xmrpayid = re.compile("[0-9a-fA-F]{16}|[0-9a-fA-F]{64}")
-#Onion addresses
-onion = re.compile("(?:https?://)|(?:http?://)?(?:www)?(\S*?\.onion)\b")
+#Onion addresses DEPRECATED
+#onion = re.compile("(?:https?://)|(?:http?://)?(?:www)?(\S*?\.onion)\b")
 #email
 email = re.compile("[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+")
 
@@ -53,20 +56,20 @@ with open('Ransomware.csv', 'wb') as csvfile:
     for filename in tqdm(os.listdir(os.getcwd())):
         with open(filename) as f:
             for line in tqdm(process(f)):
-                if btc.search(line):
-                    resultswriter.writerow([filename,"Bitcoin Address",line])
+                if url.search(line):
+                    resultswriter.writerow([filename,"URL",url.search(line).group(0)])
+                elif btc.search(line):
+                    resultswriter.writerow([filename,"Bitcoin Address",btc.search(line).group(0)])
                 elif  xmr.search(line):
-                    resultswriter.writerow([filename,"Monero Address",line])
+                    resultswriter.writerow([filename,"Monero Address",xmr.search(line).group(0)])
                 elif email.search(line):
-                    resultswriter.writerow([filename,"Email Address",line])
-                elif onion.search(line):
-                    resultswriter.writerow([filename,"Onion Address",line])
+                    resultswriter.writerow([filename,"Email Address",email.search(line).group(0)])
                 #This one needs to be near the bottom, as it matches shorter base58 strings
                 elif  bch.search(line):
-                    resultswriter.writerow([filename,"Bitcoin Cash Address",line])
-                #This one needs to be last, as it basically matches domains and emails
+                    resultswriter.writerow([filename,"Bitcoin Cash Address",bch.search(line).group(0)])
+                #This one needs to be last, as it basically matches domains and emails too
                 elif xmrpayid.search(line):
-                    resultswriter.writerow([filename,"Monero Pay ID",line])
+                    resultswriter.writerow([filename,"Monero Pay ID",xmrpayid.search(line).group(0)])
                 else:
                     pass
         f.close()
