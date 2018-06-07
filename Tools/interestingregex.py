@@ -77,29 +77,32 @@ with open('Ransomware.csv', 'wb') as csvfile:
     resultswriter = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
     resultswriter.writerow(['md5','sha1','sha256','filename','Class of Observable','Address'])
     for filename in tqdm(os.listdir(os.getcwd())):
-        with open(filename, 'rb') as f:
-            openedFile = open(filename)
-            readFile = openedFile.read()
-            md5 = hashlib.md5(readFile).hexdigest()
-            sha1 =  hashlib.sha1(readFile).hexdigest()
-            sha256 =  hashlib.sha256(readFile).hexdigest()
-            openedFile.close()
-            for line in tqdm(process(f)):
-                if url.search(line):
-                    resultswriter.writerow([md5,sha1,sha256,filename,"URL",url.search(line).group(0)])
-                elif btc_priv_key.search(line) and b58decode_check(btc_priv_key.search(line).group(0)) == True:
-                    resultswriter.writerow([md5,sha1,sha256,filename,"Bitcoin Private Key",btc_priv_key.search(line).group(0)])
-                elif xmr.search(line):
-                    resultswriter.writerow([md5,sha1,sha256,filename,"XMR Address",xmr.search(line).group(0)])
-                elif email.search(line):
-                    resultswriter.writerow([md5,sha1,sha256,filename,"Email Address",email.search(line).group(0)])
-                #This one needs to be near the bottom, as it matches shorter base58 strings
-                elif btcorbch.search(line) and b58decode_check(btcorbch.search(line).group(0)) == True:
-                    resultswriter.writerow([md5,sha1,sha256,filename,"BTC/BCH Address",btcorbch.search(line).group(0)])
-                #This one needs to be last, as it basically matches domains and emails too
-                elif xmrpayid.search(line):
-                    resultswriter.writerow([md5,sha1,sha256,filename,"XMR Pay ID",xmrpayid.search(line).group(0)])
-                else:
-                    pass
-        f.close()
+        if filename == 'Ransomware.csv':
+            pass
+        else:
+            with open(filename, 'rb') as f:
+                openedFile = open(filename)
+                readFile = openedFile.read()
+                md5 = hashlib.md5(readFile).hexdigest()
+                sha1 =  hashlib.sha1(readFile).hexdigest()
+                sha256 =  hashlib.sha256(readFile).hexdigest()
+                openedFile.close()
+                for line in tqdm(process(f)):
+                    if url.search(line):
+                        resultswriter.writerow([md5,sha1,sha256,filename,"URL",url.search(line).group(0)])
+                    elif btc_priv_key.search(line) and b58decode_check(btc_priv_key.search(line).group(0)) == True:
+                        resultswriter.writerow([md5,sha1,sha256,filename,"Bitcoin Private Key",btc_priv_key.search(line).group(0)])
+                    elif xmr.search(line):
+                        resultswriter.writerow([md5,sha1,sha256,filename,"XMR Address",xmr.search(line).group(0)])
+                    elif email.search(line):
+                        resultswriter.writerow([md5,sha1,sha256,filename,"Email Address",email.search(line).group(0)])
+                    #This one needs to be near the bottom, as it matches shorter base58 strings
+                    elif btcorbch.search(line) and b58decode_check(btcorbch.search(line).group(0)) == True:
+                        resultswriter.writerow([md5,sha1,sha256,filename,"BTC/BCH Address",btcorbch.search(line).group(0)])
+                    #This one needs to be last, as it basically matches domains and emails too
+                    elif xmrpayid.search(line):
+                        resultswriter.writerow([md5,sha1,sha256,filename,"XMR Pay ID",xmrpayid.search(line).group(0)])
+                    else:
+                        pass
+            f.close()
 csvfile.close()
