@@ -22,6 +22,7 @@ import os
 import sys
 import re
 import csv
+import hashlib
 
 #Useful Functions
 
@@ -53,23 +54,30 @@ email = re.compile("[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+")
 #The main body of code
 with open('Ransomware.csv', 'wb') as csvfile:
     resultswriter = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+    resultswriter.writerow(['md5','sha1','sha256','filename','Regex that caught this string','Matched Data'])
     for filename in tqdm(os.listdir(os.getcwd())):
         with open(filename) as f:
+            openedFile = open(filename)
+            readFile = openedFile.read()
+            md5 = hashlib.md5(readFile).hexdigest()
+            sha1 =  hashlib.sha1(readFile).hexdigest()
+            sha256 =  hashlib.sha256(readFile).hexdigest()
+            openedFile.close()
             for line in tqdm(process(f)):
                 if url.search(line):
-                    resultswriter.writerow([filename,"URL",url.search(line).group(0)])
+                    resultswriter.writerow([md5,sha1,sha256,filename,"URL",url.search(line).group(0)])
                 elif btc.search(line):
-                    resultswriter.writerow([filename,"Bitcoin Address",btc.search(line).group(0)])
+                    resultswriter.writerow([md5,sha1,sha256,filename,"Bitcoin Address",btc.search(line).group(0)])
                 elif  xmr.search(line):
-                    resultswriter.writerow([filename,"Monero Address",xmr.search(line).group(0)])
+                    resultswriter.writerow([md5,sha1,sha256,filename,"Monero Address",xmr.search(line).group(0)])
                 elif email.search(line):
-                    resultswriter.writerow([filename,"Email Address",email.search(line).group(0)])
+                    resultswriter.writerow([md5,sha1,sha256,filename,"Email Address",email.search(line).group(0)])
                 #This one needs to be near the bottom, as it matches shorter base58 strings
                 elif  bch.search(line):
-                    resultswriter.writerow([filename,"Bitcoin Cash Address",bch.search(line).group(0)])
+                    resultswriter.writerow([md5,sha1,sha256,filename,"Bitcoin Cash Address",bch.search(line).group(0)])
                 #This one needs to be last, as it basically matches domains and emails too
                 elif xmrpayid.search(line):
-                    resultswriter.writerow([filename,"Monero Pay ID",xmrpayid.search(line).group(0)])
+                    resultswriter.writerow([md5,sha1,sha256,filename,"Monero Pay ID",xmrpayid.search(line).group(0)])
                 else:
                     pass
         f.close()
