@@ -67,6 +67,11 @@ xmrpayid = re.compile("[0-9a-fA-F]{16}|[0-9a-fA-F]{64}")
 #email
 email = re.compile("[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+")
 
+try:
+    os.remove('Ransomware.csv')
+except OSError:
+    pass
+
 #The main body of code
 with open('Ransomware.csv', 'wb') as csvfile:
     resultswriter = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
