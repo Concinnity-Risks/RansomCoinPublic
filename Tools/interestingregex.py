@@ -24,9 +24,9 @@ import re
 import csv
 import hashlib
 import base58
+from monero.address import address
 
-#Useful Functions
-
+#Useful vars
 chars = r"A-Za-z0-9/\-:.,_$%'()[\]<> "
 shortest_run = 6
 
@@ -52,18 +52,24 @@ def b58decode_check(potential_address):
     else:
         return True
 
+def validate_xmr_address(xmr_address):
+    try:
+        a = address(xmr_address)
+        return True
+    except ValueError:
+        return False
 #Section for regexes we're interested in
 
 #URLs
 url = re.compile("http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+")
 
-#Crypto currency addresses and pay ids
+#Crypto currency addresses, bank accounts, and pay ids
 btc_priv_key = re.compile("5[HJK][1-9A-Za-z][^OIl]{48}")
 btcorbch = re.compile("([13][a-km-zA-HJ-NP-Z1-9]{25,34})|((bitcoincash:)?(q|p)[a-z0-9]{41})|((BITCOINCASH:)?(Q|P)[A-Z0-9]{41})")
 xmr = re.compile("4[0-9AB][1-9A-HJ-NP-Za-km-z]{93}")
 xmrpayid = re.compile("[0-9a-fA-F]{16}|[0-9a-fA-F]{64}")
-#Onion addresses DEPRECATED
-#onion = re.compile("(?:https?://)|(?:http?://)?(?:www)?(\S*?\.onion)\b")
+iban = re.compile("([A-Za-z]{2}[0-9]{2})(?=(?:[ ]?[A-Za-z0-9]){10,30}$)((?:[ ]?[A-Za-z0-9]{3,5}){2,6})([ ]?[A-Za-z0-9]{1,3})?")
+
 #email
 email = re.compile("[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+")
 
@@ -92,12 +98,12 @@ with open('Ransomware.csv', 'wb') as csvfile:
                         resultswriter.writerow([md5,sha1,sha256,filename,"URL",url.search(line).group(0)])
                     elif btc_priv_key.search(line) and b58decode_check(btc_priv_key.search(line).group(0)) == True:
                         resultswriter.writerow([md5,sha1,sha256,filename,"Bitcoin Private Key",btc_priv_key.search(line).group(0)])
-                    elif xmr.search(line):
+                    elif xmr.search(line) and validate_xmr_address(xmr.search(line).group(0)):
                         resultswriter.writerow([md5,sha1,sha256,filename,"XMR Address",xmr.search(line).group(0)])
                     elif email.search(line):
                         resultswriter.writerow([md5,sha1,sha256,filename,"Email Address",email.search(line).group(0)])
                     #This one needs to be near the bottom, as it matches shorter base58 strings
-                    elif btcorbch.search(line) and b58decode_check(btcorbch.search(line).group(0)) == True:
+                    elif btcorbch.search(line) and b58decode_check(btcorbch.search(line).group(0)):
                         resultswriter.writerow([md5,sha1,sha256,filename,"BTC/BCH Address",btcorbch.search(line).group(0)])
                     #This one needs to be last, as it basically matches domains and emails too
                     elif xmrpayid.search(line):
