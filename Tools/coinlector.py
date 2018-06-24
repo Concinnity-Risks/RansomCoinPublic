@@ -112,3 +112,4 @@ with open('Ransomware.csv', 'wb') as csvfile:
                         pass
             f.close()
 csvfile.close()
+print "\n"
