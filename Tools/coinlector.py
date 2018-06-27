@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Copyright 2018 Eireann Leverett of Concinnity Risks
+# Copyleft 2018 Eireann Leverett of Concinnity Risks
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,16 +14,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.*)
 #
-# File name interestingregex.py
+# File name coinlector.py
 # written by eireann.leverett@cantab.net
 
-from tqdm import tqdm
 import os
 import re
 import csv
 import hashlib
 import base58
 from monero.address import address
+from tqdm import tqdm
 
 # Useful vars
 chars = r"A-Za-z0-9/\-:.,_$%'()[\]<> "
@@ -73,7 +73,8 @@ btc_priv_key = re.compile("5[HJK][1-9A-Za-z][^OIl]{48}")
 btcorbch = re.compile(
     "([13][a-km-zA-HJ-NP-Z1-9]{25,34})|((bitcoincash:)?(q|p)[a-z0-9]{41})|((BITCOINCASH:)?(Q|P)[A-Z0-9]{41})")
 xmr = re.compile("4[0-9AB][1-9A-HJ-NP-Za-km-z]{93}")
-xmrpayid = re.compile("[0-9a-fA-F]{16}|[0-9a-fA-F]{64}")
+#Temporarily removed, too many false positives, not sure how to verify
+#xmrpayid = re.compile("[0-9a-fA-F]{16}|[0-9a-fA-F]{64}")
 iban = re.compile(
     "([A-Za-z]{2}[0-9]{2})(?=(?:[ ]?[A-Za-z0-9]){10,30}$)((?:[ ]?[A-Za-z0-9]{3,5}){2,6})([ ]?[A-Za-z0-9]{1,3})?")
 
@@ -144,9 +145,9 @@ with open('Ransomware.csv', 'wb') as csvfile:
                             CoinCollected = True
                     # This one needs to be last, as it basically matches
                     # domains and emails too
-                    elif xmrpayid.search(line):
+                    elif iban.search(line):
                         resultswriter.writerow(
-                            [md5, sha1, sha256, filename, "XMR Pay ID", xmrpayid.search(line).group(0)])
+                            [md5, sha1, sha256, filename, "The lesser spotted IBAN", iban.search(line).group(0)])
                         if not CoinCollected:
                             CoinCollected = True
                     else:
