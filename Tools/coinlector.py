@@ -118,7 +118,7 @@ with open('Ransomware.csv', 'wb') as csvfile:
                     if onion.search(
                             url.search(data).group(0)) and CoinCollected == False:
                         CoinCollected = True
-                elif btc_priv_key.search(data) and b58decode_check(btc_priv_key.search(data).group(0)):
+                if btc_priv_key.search(data) and b58decode_check(btc_priv_key.search(data).group(0)):
                     resultswriter.writerow([md5,
                                             sha1,
                                             sha256,
@@ -127,32 +127,30 @@ with open('Ransomware.csv', 'wb') as csvfile:
                                             btc_priv_key.search(data).group(0)])
                     if not CoinCollected:
                         CoinCollected = True
-                elif xmr.search(data) and validate_xmr_address(xmr.search(data).group(0)):
+                if xmr.search(data) and validate_xmr_address(xmr.search(data).group(0)):
                     resultswriter.writerow(
                         [md5, sha1, sha256, filename, "XMR Address", xmr.search(data).group(0)])
                     if not CoinCollected:
                         CoinCollected = True
-                elif email.search(data):
+                if email.search(data):
                     resultswriter.writerow(
                         [md5, sha1, sha256, filename, "Email Address", email.search(data).group(0)])
                     if not CoinCollected:
                         CoinCollected = True
                 # This one needs to be near the bottom, as it matches
                 # shorter base58 strings
-                elif btcorbch.search(data) and b58decode_check(btcorbch.search(data).group(0)):
+                if btcorbch.search(data) and b58decode_check(btcorbch.search(data).group(0)):
                     resultswriter.writerow(
                         [md5, sha1, sha256, filename, "BTC/BCH Address", btcorbch.search(data).group(0)])
                     if not CoinCollected:
                         CoinCollected = True
                 # This one needs to be last, as it basically matches
                 # domains and emails too
-                elif iban.search(data):
+                if iban.search(data):
                     resultswriter.writerow(
                         [md5, sha1, sha256, filename, "The lesser spotted IBAN", iban.search(data).group(0)])
                     if not CoinCollected:
                         CoinCollected = True
-                else:
-                    pass
             f.close()
             if CoinCollected:
                 CoinsCollected += 1
