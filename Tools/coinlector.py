@@ -22,6 +22,7 @@ import re
 import csv
 import hashlib
 import base58
+import mmap
 from monero.address import address
 from tqdm import tqdm
 
@@ -102,7 +103,7 @@ with open('Ransomware.csv', 'wb') as csvfile:
         if filename == 'Ransomware.csv' or filename == 'coinlector.py':
             pass
         else:
-            with open(filename, 'rb') as f:
+            with open(filename, mode='r+b') as f:
                 openedFile = open(filename)
                 readFile = openedFile.read()
                 md5 = hashlib.md5(readFile).hexdigest()
@@ -110,52 +111,51 @@ with open('Ransomware.csv', 'wb') as csvfile:
                 sha256 = hashlib.sha256(readFile).hexdigest()
                 openedFile.close()
                 CoinCollected = False
-                for line in tqdm(process(f)):
-                    if url.search(line):
-                        resultswriter.writerow(
-                            [md5, sha1, sha256, filename, "URL", url.search(line).group(0)])
-                        if onion.search(
-                                url.search(line).group(0)) and CoinCollected == False:
-                            CoinCollected = True
-                    elif btc_priv_key.search(line) and b58decode_check(btc_priv_key.search(line).group(0)):
-                        resultswriter.writerow([md5,
-                                                sha1,
-                                                sha256,
-                                                filename,
-                                                "Bitcoin Private Key",
-                                                btc_priv_key.search(line).group(0)])
-                        if not CoinCollected:
-                            CoinCollected = True
-                    elif xmr.search(line) and validate_xmr_address(xmr.search(line).group(0)):
-                        resultswriter.writerow(
-                            [md5, sha1, sha256, filename, "XMR Address", xmr.search(line).group(0)])
-                        if not CoinCollected:
-                            CoinCollected = True
-                    elif email.search(line):
-                        resultswriter.writerow(
-                            [md5, sha1, sha256, filename, "Email Address", email.search(line).group(0)])
-                        if not CoinCollected:
-                            CoinCollected = True
-                    # This one needs to be near the bottom, as it matches
-                    # shorter base58 strings
-                    elif btcorbch.search(line) and b58decode_check(btcorbch.search(line).group(0)):
-                        resultswriter.writerow(
-                            [md5, sha1, sha256, filename, "BTC/BCH Address", btcorbch.search(line).group(0)])
-                        if not CoinCollected:
-                            CoinCollected = True
-                    # This one needs to be last, as it basically matches
-                    # domains and emails too
-                    elif iban.search(line):
-                        resultswriter.writerow(
-                            [md5, sha1, sha256, filename, "The lesser spotted IBAN", iban.search(line).group(0)])
-                        if not CoinCollected:
-                            CoinCollected = True
-                    else:
-                        pass
+                data = mmap.mmap(f.fileno(), 0, prot=mmap.PROT_READ)
+                if url.search(data):
+                    resultswriter.writerow(
+                        [md5, sha1, sha256, filename, "URL", url.search(data).group(0)])
+                    if onion.search(
+                            url.search(data).group(0)) and CoinCollected == False:
+                        CoinCollected = True
+                elif btc_priv_key.search(data) and b58decode_check(btc_priv_key.search(data).group(0)):
+                    resultswriter.writerow([md5,
+                                            sha1,
+                                            sha256,
+                                            filename,
+                                            "Bitcoin Private Key",
+                                            btc_priv_key.search(data).group(0)])
+                    if not CoinCollected:
+                        CoinCollected = True
+                elif xmr.search(data) and validate_xmr_address(xmr.search(data).group(0)):
+                    resultswriter.writerow(
+                        [md5, sha1, sha256, filename, "XMR Address", xmr.search(data).group(0)])
+                    if not CoinCollected:
+                        CoinCollected = True
+                elif email.search(data):
+                    resultswriter.writerow(
+                        [md5, sha1, sha256, filename, "Email Address", email.search(data).group(0)])
+                    if not CoinCollected:
+                        CoinCollected = True
+                # This one needs to be near the bottom, as it matches
+                # shorter base58 strings
+                elif btcorbch.search(data) and b58decode_check(btcorbch.search(data).group(0)):
+                    resultswriter.writerow(
+                        [md5, sha1, sha256, filename, "BTC/BCH Address", btcorbch.search(data).group(0)])
+                    if not CoinCollected:
+                        CoinCollected = True
+                # This one needs to be last, as it basically matches
+                # domains and emails too
+                elif iban.search(data):
+                    resultswriter.writerow(
+                        [md5, sha1, sha256, filename, "The lesser spotted IBAN", iban.search(data).group(0)])
+                    if not CoinCollected:
+                        CoinCollected = True
+                else:
+                    pass
             f.close()
             if CoinCollected:
                 CoinsCollected += 1
 csvfile.close()
-print "\n"
 print "Yield ratio is: " + \
     str(100 * CoinsCollected / len(os.listdir(os.getcwd()))) + "%\n"
