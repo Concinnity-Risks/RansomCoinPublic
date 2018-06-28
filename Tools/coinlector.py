@@ -33,12 +33,9 @@ shortest_run = 6
 regexp = '[%s]{%d,}' % (chars, shortest_run)
 pattern = re.compile(regexp)
 
-
-def process(stream):
-    data = stream.read()
-    return pattern.findall(data)
-
 # Address Validation checks
+
+
 def b58decode_check(potential_address):
     '''Decode and verify the checksum of a Base58 encoded string'''
     try:
@@ -55,7 +52,8 @@ def b58decode_check(potential_address):
 
 def validate_xmr_address(xmr_address):
     try:
-        #assign an address and see if it creates an error (quick and dirty address validation)
+        # assign an address and see if it creates an error (quick and dirty
+        # address validation)
         a = address(xmr_address)
         return True
     except BaseException:
@@ -74,10 +72,6 @@ btc_priv_key = re.compile("5[HJK][1-9A-Za-z][^OIl]{48}")
 btcorbch = re.compile(
     "([13][a-km-zA-HJ-NP-Z1-9]{25,34})|((bitcoincash:)?(q|p)[a-z0-9]{41})|((BITCOINCASH:)?(Q|P)[A-Z0-9]{41})")
 xmr = re.compile("4[0-9AB][1-9A-HJ-NP-Za-km-z]{93}")
-#Temporarily removed, too many false positives, not sure how to verify
-#xmrpayid = re.compile("[0-9a-fA-F]{16}|[0-9a-fA-F]{64}")
-iban = re.compile(
-    "([A-Za-z]{2}[0-9]{2})(?=(?:[ ]?[A-Za-z0-9]){10,30}$)((?:[ ]?[A-Za-z0-9]{3,5}){2,6})([ ]?[A-Za-z0-9]{1,3})?")
 
 # email
 email = re.compile("[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+")
@@ -97,8 +91,12 @@ with open('Ransomware.csv', 'wb') as csvfile:
         delimiter=',',
         quotechar='"',
         quoting=csv.QUOTE_MINIMAL)
-    resultswriter.writerow(
-        ['md5', 'sha1', 'sha256', 'filename', 'Class of Observable', 'Potential Monetisation Vector'])
+    resultswriter.writerow(['md5',
+                            'sha1',
+                            'sha256',
+                            'filename',
+                            'Class of Observable',
+                            'Potential Monetisation Vector'])
     for filename in tqdm(os.listdir(os.getcwd())):
         if filename == 'Ransomware.csv' or filename == 'coinlector.py':
             pass
@@ -112,43 +110,39 @@ with open('Ransomware.csv', 'wb') as csvfile:
                 openedFile.close()
                 CoinCollected = False
                 data = mmap.mmap(f.fileno(), 0, prot=mmap.PROT_READ)
-                if url.search(data):
+                for match in url.finditer(data):
                     resultswriter.writerow(
-                        [md5, sha1, sha256, filename, "URL", url.search(data).group(0)])
-                    if onion.search(
-                            url.search(data).group(0)) and CoinCollected == False:
+                        [md5, sha1, sha256, filename, "URL", match])
+
+                    if onion.search(match.group(0)) and CoinCollected == False:
                         CoinCollected = True
-                if btc_priv_key.search(data) and b58decode_check(btc_priv_key.search(data).group(0)):
-                    resultswriter.writerow([md5,
-                                            sha1,
-                                            sha256,
-                                            filename,
-                                            "Bitcoin Private Key",
-                                            btc_priv_key.search(data).group(0)])
+                for match in btc_priv_key.finditer(data):
+                    if b58decode_check(match.group(0)):
+                        resultswriter.writerow([md5,
+                                                sha1,
+                                                sha256,
+                                                filename,
+                                                "Bitcoin Private Key",
+                                                match.group(0)])
                     if not CoinCollected:
                         CoinCollected = True
-                if xmr.search(data) and validate_xmr_address(xmr.search(data).group(0)):
+                for match in xmr.finditer(data):
+                    if validate_xmr_address(match.group(0)):
+                        resultswriter.writerow(
+                            [md5, sha1, sha256, filename, "XMR Address", xmr.search(data).group(0)])
+                        if not CoinCollected:
+                            CoinCollected = True
+                for match in email.finditer(data):
                     resultswriter.writerow(
-                        [md5, sha1, sha256, filename, "XMR Address", xmr.search(data).group(0)])
-                    if not CoinCollected:
-                        CoinCollected = True
-                if email.search(data):
-                    resultswriter.writerow(
-                        [md5, sha1, sha256, filename, "Email Address", email.search(data).group(0)])
+                        [md5, sha1, sha256, filename, "Email Address", match.group(0)])
                     if not CoinCollected:
                         CoinCollected = True
                 # This one needs to be near the bottom, as it matches
                 # shorter base58 strings
-                if btcorbch.search(data) and b58decode_check(btcorbch.search(data).group(0)):
-                    resultswriter.writerow(
-                        [md5, sha1, sha256, filename, "BTC/BCH Address", btcorbch.search(data).group(0)])
-                    if not CoinCollected:
-                        CoinCollected = True
-                # This one needs to be last, as it basically matches
-                # domains and emails too
-                if iban.search(data):
-                    resultswriter.writerow(
-                        [md5, sha1, sha256, filename, "The lesser spotted IBAN", iban.search(data).group(0)])
+                for match in btcorbch.finditer(data):
+                    if b58decode_check(match.group(0)):
+                        resultswriter.writerow(
+                            [md5, sha1, sha256, filename, "BTC/BCH Address", match.group(0)])
                     if not CoinCollected:
                         CoinCollected = True
             f.close()
