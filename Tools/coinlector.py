@@ -28,7 +28,6 @@ from tqdm import tqdm
 
 # Address Validation checks
 
-
 def b58decode_check(potential_address):
     '''Decode and verify the checksum of a Base58 encoded string'''
     try:
@@ -101,9 +100,10 @@ with open('Ransomware.csv', 'wb') as csvfile:
                 data = mmap.mmap(f.fileno(), 0, prot=mmap.PROT_READ)
                 for match in URL.finditer(data):
                     RESULTS_WRITER.writerow(
-                        [md5, sha1, sha256, filename, "URL", match])
+                        [md5, sha1, sha256, filename, "URL", match.group(0)])
                     if ONION.search(match.group(0)) and not CoinCollected:
                         CoinCollected = True
+                #Yeah, I know...but imagine if we did find one...never underestimate how stupid...
                 for match in BTC_PRIV_KEY.finditer(data):
                     if b58decode_check(match.group(0)):
                         RESULTS_WRITER.writerow([md5,
