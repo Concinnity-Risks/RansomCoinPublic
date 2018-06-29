@@ -16,22 +16,15 @@
 #
 # File name coinlector.py
 # written by eireann.leverett@cantab.net
-
+'''Coinlector is a tool to autoextract common monetisation format Indicators of Compromise from ransomware binaries.'''
 import os
 import re
 import csv
 import hashlib
-import base58
 import mmap
+import base58
 from monero.address import address
 from tqdm import tqdm
-
-# Useful vars
-chars = r"A-Za-z0-9/\-:.,_$%'()[\]<> "
-shortest_run = 6
-
-regexp = '[%s]{%d,}' % (chars, shortest_run)
-pattern = re.compile(regexp)
 
 # Address Validation checks
 
@@ -42,39 +35,37 @@ def b58decode_check(potential_address):
         result = base58.b58decode(potential_address)
         result, check = result[:-4], result[-4:]
         digest = hashlib.sha256(hashlib.sha256(result).digest()).digest()
+        return check == digest[:4]
     except ValueError:
         return False
-    if check != digest[:4]:
-        return False
-    else:
-        return True
 
 
 def validate_xmr_address(xmr_address):
+    '''Verify the checksum of a Monero address'''
     try:
-        # assign an address and see if it creates an error (quick and dirty
-        # address validation)
-        a = address(xmr_address)
+        # assign an address and see if it creates an error
+        address(xmr_address)
         return True
     except BaseException:
         return False
-# Section for regexes we're interested in
+
+# Section for regexes of interest as Indicators of Compromise
 
 
 # URLs
-url = re.compile(
+URL = re.compile(
     "http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+")
-# Onion addresses
-onion = re.compile("(?:https?://)|(?:http?://)?(?:www)?(\S*?\.onion)\b")
+# ONION addresses
+ONION = re.compile("(?:https?://)|(?:http?://)?(?:www)?(\S*?\.onion)\b")
 
 # Crypto currency addresses, bank accounts, and pay ids
-btc_priv_key = re.compile("5[HJK][1-9A-Za-z][^OIl]{48}")
-btcorbch = re.compile(
+BTC_PRIV_KEY = re.compile("5[HJK][1-9A-Za-z][^OIl]{48}")
+BTC_OR_BCH = re.compile(
     "([13][a-km-zA-HJ-NP-Z1-9]{25,34})|((bitcoincash:)?(q|p)[a-z0-9]{41})|((BITCOINCASH:)?(Q|P)[A-Z0-9]{41})")
-xmr = re.compile("4[0-9AB][1-9A-HJ-NP-Za-km-z]{93}")
+XMR = re.compile("4[0-9AB][1-9A-HJ-NP-Za-km-z]{93}")
 
 # email
-email = re.compile("[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+")
+EMAIL = re.compile("[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+")
 
 try:
     os.remove('Ransomware.csv')
@@ -83,71 +74,66 @@ except OSError:
 
 # This variable just helps us track how many malware files we have
 # potential Monetisation IoCs for
-CoinsCollected = 0
+COINS_COLLECTED = 0
 
 with open('Ransomware.csv', 'wb') as csvfile:
-    resultswriter = csv.writer(
+    RESULTS_WRITER = csv.writer(
         csvfile,
         delimiter=',',
         quotechar='"',
         quoting=csv.QUOTE_MINIMAL)
-    resultswriter.writerow(['md5',
-                            'sha1',
-                            'sha256',
-                            'filename',
-                            'Class of Observable',
-                            'Potential Monetisation Vector'])
+    RESULTS_WRITER.writerow(['md5',
+                             'sha1',
+                             'sha256',
+                             'filename',
+                             'Class of Observable',
+                             'Potential Monetisation Vector'])
     for filename in tqdm(os.listdir(os.getcwd())):
         if filename == 'Ransomware.csv' or filename == 'coinlector.py':
             pass
         else:
             with open(filename, mode='r+b') as f:
-                openedFile = open(filename)
-                readFile = openedFile.read()
+                readFile = f.read()
                 md5 = hashlib.md5(readFile).hexdigest()
                 sha1 = hashlib.sha1(readFile).hexdigest()
                 sha256 = hashlib.sha256(readFile).hexdigest()
-                openedFile.close()
                 CoinCollected = False
                 data = mmap.mmap(f.fileno(), 0, prot=mmap.PROT_READ)
-                for match in url.finditer(data):
-                    resultswriter.writerow(
+                for match in URL.finditer(data):
+                    RESULTS_WRITER.writerow(
                         [md5, sha1, sha256, filename, "URL", match])
-
-                    if onion.search(match.group(0)) and CoinCollected == False:
+                    if ONION.search(match.group(0)) and not CoinCollected:
                         CoinCollected = True
-                for match in btc_priv_key.finditer(data):
+                for match in BTC_PRIV_KEY.finditer(data):
                     if b58decode_check(match.group(0)):
-                        resultswriter.writerow([md5,
-                                                sha1,
-                                                sha256,
-                                                filename,
-                                                "Bitcoin Private Key",
-                                                match.group(0)])
+                        RESULTS_WRITER.writerow([md5,
+                                                 sha1,
+                                                 sha256,
+                                                 filename,
+                                                 "Bitcoin Private Key",
+                                                 match.group(0)])
                     if not CoinCollected:
                         CoinCollected = True
-                for match in xmr.finditer(data):
+                for match in XMR.finditer(data):
                     if validate_xmr_address(match.group(0)):
-                        resultswriter.writerow(
-                            [md5, sha1, sha256, filename, "XMR Address", xmr.search(data).group(0)])
+                        RESULTS_WRITER.writerow(
+                            [md5, sha1, sha256, filename, "XMR Address", match.group(0)])
                         if not CoinCollected:
                             CoinCollected = True
-                for match in email.finditer(data):
-                    resultswriter.writerow(
+                for match in EMAIL.finditer(data):
+                    RESULTS_WRITER.writerow(
                         [md5, sha1, sha256, filename, "Email Address", match.group(0)])
                     if not CoinCollected:
                         CoinCollected = True
-                # This one needs to be near the bottom, as it matches
-                # shorter base58 strings
-                for match in btcorbch.finditer(data):
+                for match in BTC_OR_BCH.finditer(data):
                     if b58decode_check(match.group(0)):
-                        resultswriter.writerow(
+                        RESULTS_WRITER.writerow(
                             [md5, sha1, sha256, filename, "BTC/BCH Address", match.group(0)])
                     if not CoinCollected:
                         CoinCollected = True
             f.close()
             if CoinCollected:
-                CoinsCollected += 1
+                COINS_COLLECTED += 1
 csvfile.close()
 print "Yield ratio is: " + \
-    str(100 * CoinsCollected / len(os.listdir(os.getcwd()))) + "%\n"
+    str(100 * COINS_COLLECTED / len(os.listdir(os.getcwd()))) + "%\n"
