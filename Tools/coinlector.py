@@ -134,6 +134,5 @@ with open('Ransomware.csv', 'wb') as csvfile:
             f.close()
             if CoinCollected:
                 COINS_COLLECTED += 1
-csvfile.close()
-print "Yield ratio is: " + \
-    str(100 * COINS_COLLECTED / len(os.listdir(os.getcwd()))) + "%\n"
+    RESULTS_WRITER.writerow(["Yield ratio is: " + str(100 * COINS_COLLECTED / len(os.listdir(os.getcwd()))) + "%"," Across",len(os.listdir(os.getcwd())),"samples","","","End of File"])
+    csvfile.close()
