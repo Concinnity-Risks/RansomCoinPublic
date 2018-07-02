@@ -31,6 +31,9 @@ with open('Ransomware.csv', 'rb') as inputfile:
             LIST_OF_ADDRESSES.append(row[5])
 inputfile.close()
 
+#deduplicate the list
+LIST_OF_ADDRESSES = list(set(LIST_OF_ADDRESSES))
+
 #print LIST_OF_ADDRESSES
 with open('AccountsRecievingRansom.csv', 'wb') as csvfile:
     RESULTS_WRITER = csv.writer(
