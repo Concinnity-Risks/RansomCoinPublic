@@ -19,6 +19,7 @@
 import requests
 import json
 import csv
+from tqdm import tqdm
 
 LIST_OF_ADDRESSES = []
 BATCH = ''
@@ -31,20 +32,20 @@ with open('Ransomware.csv', 'rb') as inputfile:
 inputfile.close()
 
 #print LIST_OF_ADDRESSES
-
-for ADDRESS in LIST_OF_ADDRESSES:
-    BATCH += ADDRESS + '|'
-result = requests.get('https://blockchain.info/multiaddr?active='+BATCH)
-if result.status_code == 200:
-    data = result.json()
-    with open('AccountsRecievingRansom.csv', 'wb') as csvfile:
-        RESULTS_WRITER = csv.writer(
-            csvfile,
-            delimiter=',',
-            quotechar='"',
-            quoting=csv.QUOTE_MINIMAL)
-        RESULTS_WRITER.writerow(['wallet', 'number of transactions', 'total received', 'total sent', 'final balance'])
-        for i in data['addresses']:
-            RESULTS_WRITER.writerow([i['address'], i['n_tx'], i['total_received'], i['total_sent'], i['final_balance']])
-        csvfile.close()
+with open('AccountsRecievingRansom.csv', 'wb') as csvfile:
+    RESULTS_WRITER = csv.writer(
+        csvfile,
+        delimiter=',',
+        quotechar='"',
+        quoting=csv.QUOTE_MINIMAL)
+    RESULTS_WRITER.writerow(['wallet', 'number of transactions', 'total received', 'total sent', 'final balance'])
+    for ADDRESS in tqdm(LIST_OF_ADDRESSES):
+        #BATCH += ADDRESS + '|'
+        result = requests.get('https://blockchain.info/rawaddr/'+ADDRESS)
+        if result.status_code == 200:
+            data = result.json()
+            RESULTS_WRITER.writerow([data['address'], data['n_tx'], data['total_received'], data['total_sent'], data['final_balance']])
+        else:
+            print 'HTTP Response is: '+str(result.status_code)
+csvfile.close()
 #print json.dumps(result.json(), indent=4, sort_keys=True)
