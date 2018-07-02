@@ -28,6 +28,7 @@ from tqdm import tqdm
 
 # Address Validation checks
 
+
 def b58decode_check(potential_address):
     '''Decode and verify the checksum of a Base58 encoded string'''
     try:
@@ -103,7 +104,8 @@ with open('Ransomware.csv', 'wb') as csvfile:
                         [md5, sha1, sha256, filename, "URL", match.group(0)])
                     if ONION.search(match.group(0)) and not CoinCollected:
                         CoinCollected = True
-                #Yeah, I know...but imagine if we did find one...never underestimate how stupid...
+                # Yeah, I know...but imagine if we did find one...never
+                # underestimate how stupid...
                 for match in BTC_PRIV_KEY.finditer(data):
                     if b58decode_check(match.group(0)):
                         RESULTS_WRITER.writerow([md5,
@@ -134,5 +136,9 @@ with open('Ransomware.csv', 'wb') as csvfile:
             f.close()
             if CoinCollected:
                 COINS_COLLECTED += 1
-    RESULTS_WRITER.writerow(["Yield ratio is: " + str(100 * COINS_COLLECTED / len(os.listdir(os.getcwd()))) + "%"," Across",len(os.listdir(os.getcwd())),"samples","","","End of File"])
+    RESULTS_WRITER.writerow(["Yield ratio is: " +
+                             str(100 *
+                                 COINS_COLLECTED /
+                                 len(os.listdir(os.getcwd()))) +
+                             "%", " Across", len(os.listdir(os.getcwd())), "samples", "", "", "End of File"])
     csvfile.close()
