@@ -1,4 +1,4 @@
-# ransomcoin
+# RansomCoin
 Extracting metadata and Indicators of Compromise from ransomware, in a scalable, efficient, way with cuckoo integrations.
 
 From the tools folder:
@@ -12,5 +12,4 @@ Currently we are testing for:
 +Bitcoin Cash Address
 +Domains
 +Email Addresses
-+Open PayIDs
 +Onion Addresses
