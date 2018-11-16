@@ -77,7 +77,7 @@ with open('Ransomware.csv', 'wb') as csvfile:
                              'Potential Monetisation Vector'])
     for filename in tqdm(os.listdir(os.getcwd())):
         #Don't analyse any of the files we produce/use
-        if filename == 'Ransomware.csv' or filename == 'coinlector.py' or filename == 'AccountsRecievingRansom.csv' or filename == 'chasingcoin.py':
+        if filename == 'Ransomware.csv' or filename == 'coinlector.py' or filename == 'AccountsRecievingRansom.csv' or filename == 'chasingcoin.py' or filename == 'eventcoin.py' or os.path.isdir(filename):
             pass
         else:
             with open(filename, mode='r+b') as f:
