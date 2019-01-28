@@ -1,15 +1,17 @@
 # RansomCoin
-Extracting metadata and hardcoded Indicators of Compromise from ransomware, in a scalable, efficient, way with cuckoo integrations. Ideally, is run during cuckoo dynamic analysis, on folders where changes occur, but can also be used for static analysis on large collections of ransomware. 
+Extracting metadata and hardcoded Indicators of Compromise from ransomware, in a scalable, efficient, way with cuckoo integrations. Ideally, is run during cuckoo dynamic analysis, but can also be used for static analysis on large collections of ransomware. Designed to be fast, with false positive limited to emails, urls, onions, and domains. In short, this is initial triage if you only want monetisation.
 
 From the tools folder:
 pip install -r requirements.txt
 
-After that: python coinlector.py will run the code across all files in the directoy and provide feedback on the ETC.
+After that: python coinlector.py will run the code across all files in the directoy and provide feedback on the estimated time to completion via TQDM.
 
 Currently we are testing for:
 +Bitcoin Addresses
-+Monero Addresses
-+Bitcoin Cash Address
++Bitcoin Cash Addresses
++Bitcoin Private Keys
++Ethereum addresses
++DASH addresses
 +Domains
 +Email Addresses
 +Onion Addresses
