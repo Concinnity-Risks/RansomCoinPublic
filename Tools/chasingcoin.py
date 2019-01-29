@@ -12,10 +12,10 @@ from tqdm import tqdm
 LIST_OF_ADDRESSES = []
 BATCH = ''
 
-with open('Ransomware.csv', 'rb') as inputfile:
+with open('Ransomware.csv', 'r') as inputfile:
     coinreader = csv.reader(inputfile, delimiter=',',)
     for row in coinreader:
-        if row[4] == 'BTC/BCH Address':
+        if row[4] == 'BTC Address':
             LIST_OF_ADDRESSES.append(row[5])
 inputfile.close()
 
@@ -23,7 +23,7 @@ inputfile.close()
 LIST_OF_ADDRESSES = list(set(LIST_OF_ADDRESSES))
 
 #print LIST_OF_ADDRESSES
-with open('AccountsRecievingRansom.csv', 'wb') as csvfile:
+with open('AccountsRecievingRansom.csv', 'w') as csvfile:
     RESULTS_WRITER = csv.writer(
         csvfile,
         delimiter=',',
@@ -45,6 +45,6 @@ with open('AccountsRecievingRansom.csv', 'wb') as csvfile:
                                      data['total_sent'],
                                      data['final_balance']])
         else:
-            print 'HTTP Response is: ' + str(result.status_code)
+            print('HTTP Response is: ' + str(result.status_code))
 csvfile.close()
 #print json.dumps(result.json(), indent=4, sort_keys=True)

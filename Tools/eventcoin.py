@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python
 # Copyleft 2018 Eireann Leverett of Concinnity Risks
 #
@@ -24,7 +23,7 @@ csvreader = csv.DictReader(csvfile)
 lines = csvfile.readlines()
 lasthash = ''
 for line in lines:
-    if "BTC/BCH" in line:
+    if "BTC Address" in line:
             attrs = line.split(",")
             if lasthash != attrs[3]:
                 lasthash = attrs[3]

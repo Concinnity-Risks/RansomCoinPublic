@@ -14,23 +14,24 @@ LIST_OF_ADDRESSES = []
 BATCH = ''
 
 if len(sys.argv) < 0:
-    with open(sys.argv[1], 'rb') as inputfile:
+    with open(sys.argv[1], 'r') as inputfile:
         #We assume it is a text file with BTC addresses on each line
         for line in inputfile:
             LIST_OF_ADDRESSES.append(line)
 else:
-    with open('Ransomware.csv', 'rb') as inputfile:
+    with open('Ransomware.csv', 'r') as inputfile:
         coinreader = csv.reader(inputfile, delimiter=',',)
         for row in coinreader:
-            if row[4] == 'BTC/BCH Address':
+            if row[4] == 'BTC Address':
                 LIST_OF_ADDRESSES.append(row[5])
 inputfile.close()
 
 # deduplicate the list
 LIST_OF_ADDRESSES = list(set(LIST_OF_ADDRESSES))
 
-#print LIST_OF_ADDRESSES
-with open('AccountsRecievingRansom.csv', 'wb') as csvfile:
+#print(LIST_OF_ADDRESSES)
+#The goal of this code is to display the temporal nature of payments
+with open('TemporalRansoms.csv', 'w') as csvfile:
     RESULTS_WRITER = csv.writer(
         csvfile,
         delimiter=',',
@@ -54,6 +55,6 @@ with open('AccountsRecievingRansom.csv', 'wb') as csvfile:
                                      data['txs']])
             time.sleep(0.1)
         else:
-            print 'HTTP Response is: ' + str(result.status_code)
+            print('HTTP Response is: ' + str(result.status_code))
 csvfile.close()
-#print json.dumps(result.json(), indent=4, sort_keys=True)
+#print(json.dumps(result.json(), indent=4, sort_keys=True))
