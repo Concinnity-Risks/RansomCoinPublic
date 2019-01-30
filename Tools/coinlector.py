@@ -21,6 +21,7 @@ from binascii import hexlify, unhexlify
 from tqdm import tqdm
 
 # Address Validation checks
+#All THIS SHOULD BE REFACTORED TO BE PASS IN THE TICKER AFTER THE REGEX SUCCEEDS
 def b58decode_check(potential_address):
     '''Decode and verify the checksum of a Base58 encoded string'''
     try:
@@ -42,8 +43,6 @@ def btc_verify( btc_match ):
 
 def bch_verify( bch_match ):
     '''Decode and verify a Bitcoin Cash address'''
-    print("Bitcoin Cash")
-    print(bch_match)
     try:
         return cashaddress.convert.is_valid(bch_match.decode("utf-8"))
     except TypeError:
@@ -64,6 +63,42 @@ def eth_verify( eth_match ):
     '''Decode and verify a Ethereum address'''
     try:
         return coinaddr.validate('eth', eth_match)
+    except TypeError:
+        return False
+    except ValueError:
+        return False
+
+def xrp_verify( xrp_match ):
+    '''Decode and verify a Ripple address'''
+    try:
+        return coinaddr.validate('xrp', xrp_match)
+    except TypeError:
+        return False
+    except ValueError:
+        return False
+
+def ltc_verify( ltc_match ):
+    '''Decode and verify a Litecoin address'''
+    try:
+        return coinaddr.validate('ltc', ltc_match)
+    except TypeError:
+        return False
+    except ValueError:
+        return False
+
+def doge_verify( doge_match ):
+    '''Decode and verify a Dogecoin address'''
+    try:
+        return coinaddr.validate('doge', doge_match)
+    except TypeError:
+        return False
+    except ValueError:
+        return False
+
+def neo_verify( neo_match ):
+    '''Decode and verify a Neocoin address'''
+    try:
+        return coinaddr.validate('neo', neo_match)
     except TypeError:
         return False
     except ValueError:
@@ -96,6 +131,10 @@ BTC = re.compile(b"[13][a-km-zA-HJ-NP-Z1-9]{25,34}")
 BCH = re.compile(b"(bitcoincash:)?(q|p)[a-z0-9]{41}|(BITCOINCASH:)?(Q|P)[A-Z0-9]{41}")
 DASH = re.compile(b"X[1-9A-HJ-NP-Za-km-z]{33}")
 ETH = re.compile(b"0x[a-fA-F0-9]{40}")
+XRP = re.compile(b"r[0-9a-zA-Z]{24,34}")
+LTC = re.compile(b"[LM3][a-km-zA-HJ-NP-Z1-9]{26,33}")
+DOGE = re.compile(b"D{1}[5-9A-HJ-NP-U]{1}[1-9A-HJ-NP-Za-km-z]{32}")
+NEO = re.compile(b"A[0-9a-zA-Z]{33}")
 #XMR = re.compile(b"4[0-9AB][1-9A-HJ-NP-Za-km-z]{93}")
 
 # email
@@ -171,7 +210,27 @@ with open('Ransomware.csv', 'w') as csvfile:
                         CoinCollected = True
                 for match in ETH.finditer(data):
                     if eth_verify(match.group(0)):
-                        RESULTS_WRITER.writerow([md5, sha1, sha256, filename, "ETH Address", match.group(0).decode("utf-8") ])
+                        RESULTS_WRITER.writerow([md5, sha1, sha256, filename, "ETH/ETC/ETZ Address", match.group(0).decode("utf-8") ])
+                    if not CoinCollected:
+                        CoinCollected = True
+                for match in LTC.finditer(data):
+                    if ltc_verify(match.group(0)):
+                        RESULTS_WRITER.writerow([md5, sha1, sha256, filename, "LTC Address", match.group(0).decode("utf-8") ])
+                    if not CoinCollected:
+                        CoinCollected = True
+                for match in NEO.finditer(data):
+                    if neo_verify(match.group(0)):
+                        RESULTS_WRITER.writerow([md5, sha1, sha256, filename, "NEO Address", match.group(0).decode("utf-8") ])
+                    if not CoinCollected:
+                        CoinCollected = True
+                for match in DOGE.finditer(data):
+                    if doge_verify(match.group(0)):
+                        RESULTS_WRITER.writerow([md5, sha1, sha256, filename, "DOGE Address", match.group(0).decode("utf-8") ])
+                    if not CoinCollected:
+                        CoinCollected = True
+                for match in XRP.finditer(data):
+                    if xrp_verify(match.group(0)):
+                        RESULTS_WRITER.writerow([md5, sha1, sha256, filename, "XRP Address", match.group(0).decode("utf-8") ])
                     if not CoinCollected:
                         CoinCollected = True
             f.close()
