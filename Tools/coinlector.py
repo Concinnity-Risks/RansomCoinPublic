@@ -13,11 +13,10 @@ import mmap
 import base58
 import coinaddr
 import cashaddress
-#Might need these for future monero expansion
-#Add to requirements when ready
 import sha3
-from binascii import hexlify, unhexlify
-#Not strictly needed, but shows progress on large sample sets
+import tlsh
+from binascii import unhexlify
+#Not strictly needed, but shows progress bar on large sample sets
 from tqdm import tqdm
 
 # Address Validation checks
@@ -104,21 +103,25 @@ def neo_verify( neo_match ):
     except ValueError:
         return False
 
-#def xmr_verify( xmr_match ):
-#    '''Verify the checksum of a Monero address'''
-#    print(xmr_match)
-#    try:
-#        decoded = bytearray(unhexlify(base58.b58decode(xmr_match)))
-#        checksum = decoded[-4:]
-#        if checksum == sha3.keccak_256(decoded[:-4]).digest()[:4]:
-#            return True
-#        else:
-#            return False
-#    except BaseException:
-#        return False
+def cn_fast_hash(s):
+    return keccak_256(unhexlify(s))
+
+def keccak_256(s):
+    k = sha3.keccak_256()
+    k.update(s)
+    return k.hexdigest()
+
+def xmr_verify( xmr_match ):
+    '''Verify the checksum of a Monero address'''
+    d = base58.b58decode(xmr_match)
+    addr_checksum = d[-8:]
+    calc_checksum = cn_fast_hash(d[:-8])[:8]
+    if addr_checksum == calc_checksum:
+        return True
+    else:
+        return False
 
 # Section for regexes of interest as Indicators of Compromise
-
 
 # URLs
 URL = re.compile(b"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+")
@@ -135,7 +138,7 @@ XRP = re.compile(b"r[0-9a-zA-Z]{24,34}")
 LTC = re.compile(b"[LM3][a-km-zA-HJ-NP-Z1-9]{26,33}")
 DOGE = re.compile(b"D{1}[5-9A-HJ-NP-U]{1}[1-9A-HJ-NP-Za-km-z]{32}")
 NEO = re.compile(b"A[0-9a-zA-Z]{33}")
-#XMR = re.compile(b"4[0-9AB][1-9A-HJ-NP-Za-km-z]{93}")
+XMR = re.compile(b"4[0-9AB][1-9A-HJ-NP-Za-km-z]{93}")
 
 # email
 EMAIL = re.compile(b"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+")
@@ -155,85 +158,94 @@ with open('Ransomware.csv', 'w') as csvfile:
         delimiter=',',
         quotechar='"',
         quoting=csv.QUOTE_MINIMAL)
-    RESULTS_WRITER.writerow(["md5","sha1","sha256","filename","Class of Observable","Potential Monetisation Vector"])
+    RESULTS_WRITER.writerow(["tlsh","md5","sha1","sha256","filename","Class of Observable","Potential Monetisation Vector"])
     for filename in tqdm(os.listdir(os.getcwd())):
         #Don't analyse any of the files we produce/use
         if filename == 'Ransomware.csv' or filename == 'coinlector.py' or filename == 'AccountsRecievingRansom.csv' or filename == 'chasingcoin.py' or filename == 'eventcoin.py' or os.path.isdir(filename):
             pass
         else:
-            with open(filename, mode='r+b') as f:
-                readFile = f.read()
-                md5 = hashlib.md5(readFile).hexdigest()
-                sha1 = hashlib.sha1(readFile).hexdigest()
-                sha256 = hashlib.sha256(readFile).hexdigest()
-                CoinCollected = False
-                data = mmap.mmap(f.fileno(), 0, prot=mmap.PROT_READ)
-                for match in URL.finditer(data):
-                    RESULTS_WRITER.writerow([md5, sha1, sha256, filename, "URL", match.group(0).decode("utf-8")])
-                    if ONION.search(match.group(0)) and not CoinCollected:
-                        CoinCollected = True
-                # Yeah, I know...but imagine if we did find one...never
-                # underestimate how stupid...
-                for match in BTC_PRIV_KEY.finditer(data):
-                    if b58decode_check(match.group(0)):
-                        RESULTS_WRITER.writerow([md5,
-                                                 sha1,
-                                                 sha256,
-                                                 filename,
-                                                 "Bitcoin Private Key",
-                                                 match.group(0).decode("utf-8")])
-                    if not CoinCollected:
-                        CoinCollected = True
-#                for match in XMR.finditer(data):
-#                    if xmr_verify(match.group(0)):
-#                        RESULTS_WRITER.writerow([md5, sha1, sha256, filename, "XMR Address", match.group(0).decode("utf-8")])
-#                    if not CoinCollected:
-#                        CoinCollected = True
-                for match in EMAIL.finditer(data):
-                    RESULTS_WRITER.writerow([md5, sha1, sha256, filename, "Email Address", match.group(0).decode("utf-8")])
-                    if not CoinCollected:
-                        CoinCollected = True
-                for match in BTC.finditer(data):
-                    if btc_verify(match.group(0)):
-                        RESULTS_WRITER.writerow([md5, sha1, sha256, filename, "BTC Address", match.group(0).decode("utf-8")])
-                    if not CoinCollected:
-                        CoinCollected = True
-                for match in BCH.finditer(data):
-                    if bch_verify(match.group(0)):
-                        RESULTS_WRITER.writerow([md5, sha1, sha256, filename, "BCH Address", match.group(0).decode("utf-8") ])
-                    if not CoinCollected:
-                        CoinCollected = True
-                for match in DASH.finditer(data):
-                    if dash_verify(match.group(0)):
-                        RESULTS_WRITER.writerow([md5, sha1, sha256, filename, "DASH Address", match.group(0).decode("utf-8") ])
-                    if not CoinCollected:
-                        CoinCollected = True
-                for match in ETH.finditer(data):
-                    if eth_verify(match.group(0)):
-                        RESULTS_WRITER.writerow([md5, sha1, sha256, filename, "ETH/ETC/ETZ Address", match.group(0).decode("utf-8") ])
-                    if not CoinCollected:
-                        CoinCollected = True
-                for match in LTC.finditer(data):
-                    if ltc_verify(match.group(0)):
-                        RESULTS_WRITER.writerow([md5, sha1, sha256, filename, "LTC Address", match.group(0).decode("utf-8") ])
-                    if not CoinCollected:
-                        CoinCollected = True
-                for match in NEO.finditer(data):
-                    if neo_verify(match.group(0)):
-                        RESULTS_WRITER.writerow([md5, sha1, sha256, filename, "NEO Address", match.group(0).decode("utf-8") ])
-                    if not CoinCollected:
-                        CoinCollected = True
-                for match in DOGE.finditer(data):
-                    if doge_verify(match.group(0)):
-                        RESULTS_WRITER.writerow([md5, sha1, sha256, filename, "DOGE Address", match.group(0).decode("utf-8") ])
-                    if not CoinCollected:
-                        CoinCollected = True
-                for match in XRP.finditer(data):
-                    if xrp_verify(match.group(0)):
-                        RESULTS_WRITER.writerow([md5, sha1, sha256, filename, "XRP Address", match.group(0).decode("utf-8") ])
-                    if not CoinCollected:
-                        CoinCollected = True
-            f.close()
+            try:
+                with open(filename, mode='r+b') as f:
+                    readFile = f.read()
+                    tlshash = tlsh.hash(readFile)
+                    md5 = hashlib.md5(readFile).hexdigest()
+                    sha1 = hashlib.sha1(readFile).hexdigest()
+                    sha256 = hashlib.sha256(readFile).hexdigest()
+                    CoinCollected = False
+                    try:
+                        data = mmap.mmap(f.fileno(), 0, prot=mmap.PROT_READ)
+                    #An empty file crashes mmap, so we skip it to continue analysis
+                    except ValueError:
+                        pass
+                    for match in URL.finditer(data):
+                        RESULTS_WRITER.writerow([tlshash, md5, sha1, sha256, filename, "URL", match.group(0).decode("utf-8")])
+                        if ONION.search(match.group(0)) and not CoinCollected:
+                            CoinCollected = True
+                    # Yeah, I know...but imagine if we did find one...never
+                    # underestimate how stupid...
+                    for match in BTC_PRIV_KEY.finditer(data):
+                        if b58decode_check(match.group(0)):
+                            RESULTS_WRITER.writerow([tlshash, md5,
+                                                     sha1,
+                                                     sha256,
+                                                     filename,
+                                                     "Bitcoin Private Key",
+                                                     match.group(0).decode("utf-8")])
+                        if not CoinCollected:
+                            CoinCollected = True
+    #                for match in XMR.finditer(data):
+    #                    if xmr_verify(match.group(0)):
+    #                        RESULTS_WRITER.writerow([tlshash, md5, sha1, sha256, filename, "XMR Address", match.group(0).decode("utf-8")])
+    #                    if not CoinCollected:
+    #                        CoinCollected = True
+                    for match in EMAIL.finditer(data):
+                        RESULTS_WRITER.writerow([tlshash, md5, sha1, sha256, filename, "Email", match.group(0).decode("utf-8")])
+                        if not CoinCollected:
+                            CoinCollected = True
+                    for match in BTC.finditer(data):
+                        if btc_verify(match.group(0)):
+                            RESULTS_WRITER.writerow([tlshash, md5, sha1, sha256, filename, "BTC Address", match.group(0).decode("utf-8")])
+                        if not CoinCollected:
+                            CoinCollected = True
+                    for match in BCH.finditer(data):
+                        if bch_verify(match.group(0)):
+                            RESULTS_WRITER.writerow([tlshash, md5, sha1, sha256, filename, "BCH Address", match.group(0).decode("utf-8") ])
+                        if not CoinCollected:
+                            CoinCollected = True
+                    for match in DASH.finditer(data):
+                        if dash_verify(match.group(0)):
+                            RESULTS_WRITER.writerow([tlshash, md5, sha1, sha256, filename, "DASH Address", match.group(0).decode("utf-8") ])
+                        if not CoinCollected:
+                            CoinCollected = True
+                    for match in ETH.finditer(data):
+                        if eth_verify(match.group(0)):
+                            RESULTS_WRITER.writerow([tlshash, md5, sha1, sha256, filename, "ETH/ETC/ETZ Address", match.group(0).decode("utf-8") ])
+                        if not CoinCollected:
+                            CoinCollected = True
+                    for match in LTC.finditer(data):
+                        if ltc_verify(match.group(0)):
+                            RESULTS_WRITER.writerow([tlshash, md5, sha1, sha256, filename, "LTC Address", match.group(0).decode("utf-8") ])
+                        if not CoinCollected:
+                            CoinCollected = True
+                    for match in NEO.finditer(data):
+                        if neo_verify(match.group(0)):
+                            RESULTS_WRITER.writerow([tlshash, md5, sha1, sha256, filename, "NEO Address", match.group(0).decode("utf-8") ])
+                        if not CoinCollected:
+                            CoinCollected = True
+                    for match in DOGE.finditer(data):
+                        if doge_verify(match.group(0)):
+                            RESULTS_WRITER.writerow([tlshash, md5, sha1, sha256, filename, "DOGE Address", match.group(0).decode("utf-8") ])
+                        if not CoinCollected:
+                            CoinCollected = True
+                    for match in XRP.finditer(data):
+                        if xrp_verify(match.group(0)):
+                            RESULTS_WRITER.writerow([tlshash, md5, sha1, sha256, filename, "XRP Address", match.group(0).decode("utf-8") ])
+                        if not CoinCollected:
+                            CoinCollected = True
+                f.close()
+            except PermissionError:
+                print("Some files are beyond the permissions of your user.")
+                pass
             if CoinCollected:
                 COINS_COLLECTED += 1
     RESULTS_WRITER.writerow(["Yield ratio is: " +
