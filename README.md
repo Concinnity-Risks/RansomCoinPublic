@@ -2,9 +2,11 @@
 Extracting metadata and hardcoded Indicators of Compromise from ransomware, in a scalable, efficient, way with cuckoo integrations. Ideally, is run during cuckoo dynamic analysis, but can also be used for static analysis on large collections of ransomware. Designed to be fast, with false positive limited to emails, urls, onions, and domains. In short, this is initial triage if you only want monetisation.
 
 From the tools folder:
-pip install -r requirements.txt
+python3 -m pip install -r requirements.txt
+However, you will still need to follow the instructions to install TLSH by hand
+https://github.com/trendmicro/tlsh
 
-After that: python coinlector.py will run the code across all files in the directoy and provide feedback on the estimated time to completion via TQDM.
+After that: python3 coinlector.py will run the code across all files in the directoy and provide feedback on the estimated time to completion via TQDM.
 
 Currently we are testing for:
 +Bitcoin Addresses
