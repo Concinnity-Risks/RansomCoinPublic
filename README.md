@@ -2,6 +2,7 @@
 Extracting metadata and hardcoded Indicators of Compromise from ransomware, in a scalable, efficient, way with cuckoo integrations. Ideally, is run during cuckoo dynamic analysis, but can also be used for static analysis on large collections of ransomware. Designed to be fast, with false positive limited to emails, urls, onions, and domains. In short, this is initial triage if you only want monetisation.
 
 ---Installation instructions---
+
 From the tools folder:
 python3 -m pip install -r requirements.txt
 sudo apt-get install python3-tlsh
