@@ -4,9 +4,10 @@ Extracting metadata and hardcoded Indicators of Compromise from ransomware, in a
 ---Installation instructions---
 
 From the tools folder:
+'''
 python3 -m pip install -r requirements.txt
 sudo apt-get install python3-tlsh
-
+'''
 After that: python3 coinlector.py will run the code across all files in the directoy and provide feedback on the estimated time to completion via TQDM.
 
 Currently we are testing for:
