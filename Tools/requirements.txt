@@ -2,3 +2,6 @@ base58==1.0.3
 coinaddr==1.0.1
 tqdm==4.23.4
 cashaddress==1.0.5
+python3-tlsh==3.4.0
+magic==0.4.15
+pdftotext==2.1.2
