@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # Copyleft 2018 Eireann Leverett of Concinnity Risks
 #
-# File name coinlector3.py
+# File name coinlector.py
 # written by eireann.leverett@cantab.net
 # Python 3 compatible version
 '''Coinlector is a tool to autoextract common monetisation format Indicators of Compromise from ransomware binaries.'''
@@ -154,6 +154,9 @@ except OSError:
 # potential Monetisation IoCs for
 COINS_COLLECTED = 0
 
+#This variable helps us get our yield callculations correct
+FILES_WE_PRODUCE = 0
+
 with open('Ransomware.csv', 'w') as csvfile:
     RESULTS_WRITER = csv.writer(
         csvfile,
@@ -164,6 +167,7 @@ with open('Ransomware.csv', 'w') as csvfile:
     for filename in tqdm(os.listdir(os.getcwd())):
         #Don't analyse any of the files we produce/use
         if filename == 'Ransomware.csv' or filename == 'coinlector.py' or filename == 'AccountsRecievingRansom.csv' or filename == 'chasingcoin.py' or filename == 'eventcoin.py' or os.path.isdir(filename):
+            FILES_WE_PRODUCE += 1
             pass
         else:
             try:
@@ -261,7 +265,7 @@ with open('Ransomware.csv', 'w') as csvfile:
                 COINS_COLLECTED += 1
     RESULTS_WRITER.writerow(["Yield ratio is: " +
                              str(100 *
-                                 COINS_COLLECTED /
-                                 len(os.listdir(os.getcwd()))) +
-                             "%", " Across", len(os.listdir(os.getcwd())), "samples", "", "", "End of File"])
+                                COINS_COLLECTED /
+                                (len(os.listdir(os.getcwd()))-FILES_WE_PRODUCE)) +
+                             "%", " Across", len(os.listdir(os.getcwd()))-FILES_WE_PRODUCE, "samples", "", "", "End of File"])
     csvfile.close()
