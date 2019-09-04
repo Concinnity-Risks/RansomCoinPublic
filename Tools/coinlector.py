@@ -188,75 +188,75 @@ with open('Ransomware.csv', 'w') as csvfile:
                             data = readFile
                         else:
                             data = mmap.mmap(f.fileno(), 0, prot=mmap.PROT_READ)
+                        for match in URL.finditer(data):
+                            RESULTS_WRITER.writerow([tlshash, md5, sha1, sha256, filename, filetype, "URL", match.group(0).decode("utf-8")])
+                            if ONION.search(match.group(0)) and not CoinCollected:
+                                CoinCollected = True
+                        # Yeah, I know...but imagine if we did find one...never
+                        # underestimate how stupid...
+                        for match in BTC_PRIV_KEY.finditer(data):
+                            if b58decode_check(match.group(0)):
+                                RESULTS_WRITER.writerow([tlshash, md5,
+                                                         sha1,
+                                                         sha256,
+                                                         filename,
+                                                         filetype,
+                                                         "Bitcoin Private Key",
+                                                         match.group(0).decode("utf-8")])
+                            if not CoinCollected:
+                                CoinCollected = True
+        #                for match in XMR.finditer(data):
+        #                    if xmr_verify(match.group(0)):
+        #                        RESULTS_WRITER.writerow([tlshash, md5, sha1, sha256, filename, filetype, "XMR Address", match.group(0).decode("utf-8")])
+        #                    if not CoinCollected:
+        #                        CoinCollected = True
+                        for match in EMAIL.finditer(data):
+                            RESULTS_WRITER.writerow([tlshash, md5, sha1, sha256, filename, filetype, "Email", match.group(0).decode("utf-8")])
+                            if not CoinCollected:
+                                CoinCollected = True
+                        for match in BTC.finditer(data):
+                            if btc_verify(match.group(0)):
+                                RESULTS_WRITER.writerow([tlshash, md5, sha1, sha256, filename, filetype, "BTC Address", match.group(0).decode("utf-8")])
+                            if not CoinCollected:
+                                CoinCollected = True
+                        for match in BCH.finditer(data):
+                            if bch_verify(match.group(0)):
+                                RESULTS_WRITER.writerow([tlshash, md5, sha1, sha256, filename, filetype, "BCH Address", match.group(0).decode("utf-8") ])
+                            if not CoinCollected:
+                                CoinCollected = True
+                        for match in DASH.finditer(data):
+                            if dash_verify(match.group(0)):
+                                RESULTS_WRITER.writerow([tlshash, md5, sha1, sha256, filename, filetype, "DASH Address", match.group(0).decode("utf-8") ])
+                            if not CoinCollected:
+                                CoinCollected = True
+                        for match in ETH.finditer(data):
+                            if eth_verify(match.group(0)):
+                                RESULTS_WRITER.writerow([tlshash, md5, sha1, sha256, filename, filetype, "ETH/ETC/ETZ Address", match.group(0).decode("utf-8") ])
+                            if not CoinCollected:
+                                CoinCollected = True
+                        for match in LTC.finditer(data):
+                            if ltc_verify(match.group(0)):
+                                RESULTS_WRITER.writerow([tlshash, md5, sha1, sha256, filename, filetype, "LTC Address", match.group(0).decode("utf-8") ])
+                            if not CoinCollected:
+                                CoinCollected = True
+                        for match in NEO.finditer(data):
+                            if neo_verify(match.group(0)):
+                                RESULTS_WRITER.writerow([tlshash, md5, sha1, sha256, filename, filetype, "NEO Address", match.group(0).decode("utf-8") ])
+                            if not CoinCollected:
+                                CoinCollected = True
+                        for match in DOGE.finditer(data):
+                            if doge_verify(match.group(0)):
+                                RESULTS_WRITER.writerow([tlshash, md5, sha1, sha256, filename, filetype, "DOGE Address", match.group(0).decode("utf-8") ])
+                            if not CoinCollected:
+                                CoinCollected = True
+                        for match in XRP.finditer(data):
+                            if xrp_verify(match.group(0)):
+                                RESULTS_WRITER.writerow([tlshash, md5, sha1, sha256, filename, filetype, "XRP Address", match.group(0).decode("utf-8") ])
+                            if not CoinCollected:
+                                CoinCollected = True
                     #An empty file crashes mmap, so we skip it to continue analysis
                     except ValueError:
                         pass
-                    for match in URL.finditer(data):
-                        RESULTS_WRITER.writerow([tlshash, md5, sha1, sha256, filename, filetype, "URL", match.group(0).decode("utf-8")])
-                        if ONION.search(match.group(0)) and not CoinCollected:
-                            CoinCollected = True
-                    # Yeah, I know...but imagine if we did find one...never
-                    # underestimate how stupid...
-                    for match in BTC_PRIV_KEY.finditer(data):
-                        if b58decode_check(match.group(0)):
-                            RESULTS_WRITER.writerow([tlshash, md5,
-                                                     sha1,
-                                                     sha256,
-                                                     filename,
-                                                     filetype,
-                                                     "Bitcoin Private Key",
-                                                     match.group(0).decode("utf-8")])
-                        if not CoinCollected:
-                            CoinCollected = True
-    #                for match in XMR.finditer(data):
-    #                    if xmr_verify(match.group(0)):
-    #                        RESULTS_WRITER.writerow([tlshash, md5, sha1, sha256, filename, filetype, "XMR Address", match.group(0).decode("utf-8")])
-    #                    if not CoinCollected:
-    #                        CoinCollected = True
-                    for match in EMAIL.finditer(data):
-                        RESULTS_WRITER.writerow([tlshash, md5, sha1, sha256, filename, filetype, "Email", match.group(0).decode("utf-8")])
-                        if not CoinCollected:
-                            CoinCollected = True
-                    for match in BTC.finditer(data):
-                        if btc_verify(match.group(0)):
-                            RESULTS_WRITER.writerow([tlshash, md5, sha1, sha256, filename, filetype, "BTC Address", match.group(0).decode("utf-8")])
-                        if not CoinCollected:
-                            CoinCollected = True
-                    for match in BCH.finditer(data):
-                        if bch_verify(match.group(0)):
-                            RESULTS_WRITER.writerow([tlshash, md5, sha1, sha256, filename, filetype, "BCH Address", match.group(0).decode("utf-8") ])
-                        if not CoinCollected:
-                            CoinCollected = True
-                    for match in DASH.finditer(data):
-                        if dash_verify(match.group(0)):
-                            RESULTS_WRITER.writerow([tlshash, md5, sha1, sha256, filename, filetype, "DASH Address", match.group(0).decode("utf-8") ])
-                        if not CoinCollected:
-                            CoinCollected = True
-                    for match in ETH.finditer(data):
-                        if eth_verify(match.group(0)):
-                            RESULTS_WRITER.writerow([tlshash, md5, sha1, sha256, filename, filetype, "ETH/ETC/ETZ Address", match.group(0).decode("utf-8") ])
-                        if not CoinCollected:
-                            CoinCollected = True
-                    for match in LTC.finditer(data):
-                        if ltc_verify(match.group(0)):
-                            RESULTS_WRITER.writerow([tlshash, md5, sha1, sha256, filename, filetype, "LTC Address", match.group(0).decode("utf-8") ])
-                        if not CoinCollected:
-                            CoinCollected = True
-                    for match in NEO.finditer(data):
-                        if neo_verify(match.group(0)):
-                            RESULTS_WRITER.writerow([tlshash, md5, sha1, sha256, filename, filetype, "NEO Address", match.group(0).decode("utf-8") ])
-                        if not CoinCollected:
-                            CoinCollected = True
-                    for match in DOGE.finditer(data):
-                        if doge_verify(match.group(0)):
-                            RESULTS_WRITER.writerow([tlshash, md5, sha1, sha256, filename, filetype, "DOGE Address", match.group(0).decode("utf-8") ])
-                        if not CoinCollected:
-                            CoinCollected = True
-                    for match in XRP.finditer(data):
-                        if xrp_verify(match.group(0)):
-                            RESULTS_WRITER.writerow([tlshash, md5, sha1, sha256, filename, filetype, "XRP Address", match.group(0).decode("utf-8") ])
-                        if not CoinCollected:
-                            CoinCollected = True
                 f.close()
             except PermissionError:
                 print("Some files are beyond the permissions of your user.")
