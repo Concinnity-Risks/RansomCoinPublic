@@ -5,8 +5,8 @@ Extracting metadata and hardcoded Indicators of Compromise from ransomware, in a
 
 From the tools folder:
 ```
+sudo apt-get install build-essential libpoppler-cpp-dev pkg-config python-dev python3-tlsh
 python3 -m pip install -r requirements.txt
-sudo apt-get install python3-tlsh
 ```
 
 ---Usage instructions---
