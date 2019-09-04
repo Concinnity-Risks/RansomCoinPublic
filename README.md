@@ -15,7 +15,7 @@ python3 -m pip install -r requirements.txt
 python3 coinlector.py
 ```
 
-This will run the code across all files in the directoy and provide feedback on the estimated time to completion via TQDM.
+This will run the code across all files in the directoy and provide feedback on the estimated time to completion via TQDM. You will need write access for a file called Ransomware.csv in the directory you are working in (which contains the results). It should be possible to run the code across read only malware files though, so only Ransomware.csv need write access.
 
 Currently we are testing for:
 ```

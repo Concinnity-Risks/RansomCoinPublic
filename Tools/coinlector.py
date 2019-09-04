@@ -172,7 +172,7 @@ with open('Ransomware.csv', 'w') as csvfile:
         else:
             try:
                 filetype = magic.from_file(filename)
-                with open(filename, mode='r+b') as f:
+                with open(filename, mode='rb') as f:
                     if 'PDF document' in filetype:
                         pdf = pdftotext.PDF(f)
                         readFile = bytes("\n\n".join(pdf),'UTF-8')
