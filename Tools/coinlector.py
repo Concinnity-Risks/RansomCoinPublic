@@ -183,6 +183,7 @@ with open('Ransomware.csv', 'w') as csvfile:
                     sha1 = hashlib.sha1(readFile).hexdigest()
                     sha256 = hashlib.sha256(readFile).hexdigest()
                     CoinCollected = False
+                    RESULTS_WRITER.writerow([tlshash, md5, sha1, sha256, filename, filetype, "NONE", "Analysed"])
                     try:
                         if 'PDF document' in filetype:
                             data = readFile
