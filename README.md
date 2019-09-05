@@ -35,11 +35,14 @@ Currently we are testing for:
 +Onion Addresses
 ```
 ---Inventory---
+
 +chaisingcoin.py gathers basic info on amounts recieved in BTC, by accounts gathered, based on the output of coinlector.py.
+
 +eventcoin.py make IoCs of BTC addresses for a MISP instance, based on the output of coinlector.py. Can easily be extended to include other IoCs such as URLs or XMR accounts.
 
 ---Consider Donating---
+
 We accept anonymous donations via Monero address: 
 82XYqsdEi6oCe2Rekg99pCjPxGCyJyNaA9m5R51LqDPgD1PGvS82YA9PUpPL3uXZf4ZZT2DnLBejKCXyk2YbmJUEB6FoTik
 
-![A QR Code for donating to the development](https://github.com/Concinnity-Risks/RansomCoinPublic/blob/master/RansomCoinMoneroDonationAddress.png)
+![A QR Code for donating to the software development](https://github.com/Concinnity-Risks/RansomCoinPublic/blob/master/RansomCoinMoneroDonationAddress.png)
