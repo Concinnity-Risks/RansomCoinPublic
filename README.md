@@ -1,5 +1,7 @@
 # RansomCoin
-Extracting metadata and hardcoded Indicators of Compromise from ransomware, in a scalable, efficient, way with cuckoo integrations. Ideally, is run during cuckoo dynamic analysis, but can also be used for static analysis on large collections of ransomware. Designed to be fast, with false positive limited to emails, urls, onions, and domains. In short, this is initial triage if you only want monetisation.
+Extracting metadata and hardcoded Indicators of Compromise from ransomware, in a scalable, efficient, way with cuckoo integrations. Ideally, is it run during cuckoo dynamic analysis, but can also be used for static analysis on large collections of ransomware. Designed to be fast, with low false positive for cryptocurrency addresses. Limited false positives for emails, urls, onions, and domains (which is pretty hard to make perfect). 
+
+In short, this is fast and easy initial triage if you only want monetisation vectors.
 
 ---Installation instructions---
 
@@ -32,6 +34,12 @@ Currently we are testing for:
 +Email Addresses
 +Onion Addresses
 ```
+---Inventory---
++chaisingcoin.py gathers basic info on amounts recieved in BTC, by accounts gathered, based on the output of coinlector.py.
++eventcoin.py make IoCs of BTC addresses for a MISP instance, based on the output of coinlector.py. Can easily be extended to include other IoCs such as URLs or XMR accounts.
 
-chaisingcoin.py gathers basic info on amounts recieved in BTC, by accounts gathered, based on the output of coinlector.py.
-eventcoin.py make IoCs of BTC addresses for a MISP instance, based on the output of coinlector.py. Can easily be extended to include other IoCs such as URLs or XMR accounts.
+---Consider Donating---
+We accept anonymous donations via Monero address: 
+82XYqsdEi6oCe2Rekg99pCjPxGCyJyNaA9m5R51LqDPgD1PGvS82YA9PUpPL3uXZf4ZZT2DnLBejKCXyk2YbmJUEB6FoTik
+
+![A QR Code for donating to the development](https://github.com/Concinnity-Risks/RansomCoinPublic/blob/master/RansomCoinMoneroDonationAddress.png)
