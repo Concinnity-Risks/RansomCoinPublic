@@ -42,7 +42,7 @@ Currently we are testing for:
 
 ---Consider Donating---
 
-We accept anonymous donations via Monero address: 
+We accept anonymous donations towards our software development on this project via a Monero address: 
 82XYqsdEi6oCe2Rekg99pCjPxGCyJyNaA9m5R51LqDPgD1PGvS82YA9PUpPL3uXZf4ZZT2DnLBejKCXyk2YbmJUEB6FoTik
 
 ![A QR Code for donating to the software development](https://github.com/Concinnity-Risks/RansomCoinPublic/blob/master/RansomCoinMoneroDonationAddress.png)
