@@ -210,7 +210,6 @@ with open('Ransomware.csv', 'w') as csvfile:
                                 CoinCollected = True
                         for match in XMR.finditer(data):
                             if xmr_verify(match.group(0)):
-                                print("Writing!")
                                 RESULTS_WRITER.writerow([tlshash, md5, sha1, sha256, filename, filetype, "XMR Address", match.group(0).decode("utf-8")])
                             if not CoinCollected:
                                 CoinCollected = True
