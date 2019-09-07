@@ -17,7 +17,8 @@ import sha3
 import tlsh
 import magic
 import pdftotext
-from binascii import unhexlify
+import monerobase58
+from binascii import hexlify,unhexlify
 #Not strictly needed, but shows progress bar on large sample sets
 from tqdm import tqdm
 
@@ -105,22 +106,25 @@ def neo_verify( neo_match ):
     except ValueError:
         return False
 
-def cn_fast_hash(s):
-    return keccak_256(unhexlify(s))
-
-def keccak_256(s):
-    k = sha3.keccak_256()
-    k.update(s)
-    return k.hexdigest()
-
 def xmr_verify( xmr_match ):
-    '''Verify the checksum of a Monero address'''
-    d = base58.b58decode(xmr_match)
-    addr_checksum = d[-8:]
-    calc_checksum = cn_fast_hash(d[:-8])[:8]
-    if addr_checksum == calc_checksum:
-        return True
-    else:
+    try:
+        pubAddrHex = monerobase58.decode(xmr_match.decode("utf8"))
+        pubAddrChksum = pubAddrHex[-8:]
+        pubAddrForHash = pubAddrHex[:-8]
+        #print(pubAddrChksum)
+        #print(pubAddrForHash)
+        k = sha3.keccak_256()
+        k.update(unhexlify(pubAddrForHash))
+        pubAddrHash = k.hexdigest()
+        pubAddrChksum2 = pubAddrHash[:8]
+        if pubAddrChksum2 == pubAddrChksum:
+            #print("True: %s" % xmr_match)
+            return True
+        else:
+            #print("False: %s" % xmr_match)
+            return False
+    except Exception as E:
+        #print("Exception: %s" % E)
         return False
 
 # Section for regexes of interest as Indicators of Compromise
@@ -140,7 +144,7 @@ XRP = re.compile(b"r[0-9a-zA-Z]{24,34}")
 LTC = re.compile(b"[LM3][a-km-zA-HJ-NP-Z1-9]{26,33}")
 DOGE = re.compile(b"D{1}[5-9A-HJ-NP-U]{1}[1-9A-HJ-NP-Za-km-z]{32}")
 NEO = re.compile(b"A[0-9a-zA-Z]{33}")
-XMR = re.compile(b"4[0-9AB][1-9A-HJ-NP-Za-km-z]{93}")
+XMR = re.compile(b"4[0-9AB][0-9a-zA-Z]{93,104}")
 
 # email
 EMAIL = re.compile(b"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+")
@@ -193,8 +197,6 @@ with open('Ransomware.csv', 'w') as csvfile:
                             RESULTS_WRITER.writerow([tlshash, md5, sha1, sha256, filename, filetype, "URL", match.group(0).decode("utf-8")])
                             if ONION.search(match.group(0)) and not CoinCollected:
                                 CoinCollected = True
-                        # Yeah, I know...but imagine if we did find one...never
-                        # underestimate how stupid...
                         for match in BTC_PRIV_KEY.finditer(data):
                             if b58decode_check(match.group(0)):
                                 RESULTS_WRITER.writerow([tlshash, md5,
@@ -206,11 +208,12 @@ with open('Ransomware.csv', 'w') as csvfile:
                                                          match.group(0).decode("utf-8")])
                             if not CoinCollected:
                                 CoinCollected = True
-        #                for match in XMR.finditer(data):
-        #                    if xmr_verify(match.group(0)):
-        #                        RESULTS_WRITER.writerow([tlshash, md5, sha1, sha256, filename, filetype, "XMR Address", match.group(0).decode("utf-8")])
-        #                    if not CoinCollected:
-        #                        CoinCollected = True
+                        for match in XMR.finditer(data):
+                            if xmr_verify(match.group(0)):
+                                print("Writing!")
+                                RESULTS_WRITER.writerow([tlshash, md5, sha1, sha256, filename, filetype, "XMR Address", match.group(0).decode("utf-8")])
+                            if not CoinCollected:
+                                CoinCollected = True
                         for match in EMAIL.finditer(data):
                             RESULTS_WRITER.writerow([tlshash, md5, sha1, sha256, filename, filetype, "Email", match.group(0).decode("utf-8")])
                             if not CoinCollected:
