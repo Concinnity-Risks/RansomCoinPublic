@@ -23,6 +23,7 @@ Currently we are testing for:
 ```
 +Bitcoin Addresses
 +Bitcoin Cash Addresses
++Monero Addresses
 +Bitcoin Private Keys
 +Ethereum addresses
 +Ripple addresses
