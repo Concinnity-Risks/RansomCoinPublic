@@ -4,3 +4,4 @@ tqdm==4.23.4
 cashaddress==1.0.5
 python-magic==0.4.15
 pdftotext==2.1.2
+pymisp=2.4.92.1
