@@ -178,8 +178,11 @@ with open('Ransomware.csv', 'w') as csvfile:
                 filetype = magic.from_file(filename)
                 with open(filename, mode='rb') as f:
                     if 'PDF document' in filetype:
-                        pdf = pdftotext.PDF(f)
-                        readFile = bytes("\n\n".join(pdf),'UTF-8')
+                        try:
+                            pdf = pdftotext.PDF(f)
+                            readFile = bytes("\n\n".join(pdf),'UTF-8')
+                        except:
+                            readFile = f.read()
                     else:
                         readFile = f.read()
                     tlshash = tlsh.hash(readFile)
