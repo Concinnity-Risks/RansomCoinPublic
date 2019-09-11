@@ -176,6 +176,8 @@ with open('Ransomware.csv', 'w') as csvfile:
         else:
             try:
                 filetype = magic.from_file(filename)
+                #Strip the commas from the strings so we don't break our own csv output formatting
+                filetype = filetype.replace(',', '')
                 with open(filename, mode='rb') as f:
                     if 'PDF document' in filetype:
                         try:
