@@ -10,7 +10,6 @@ import csv
 from tqdm import tqdm
 
 LIST_OF_ADDRESSES = []
-BATCH = ''
 
 with open('Ransomware.csv', 'r') as inputfile:
     coinreader = csv.reader(inputfile, delimiter=',',)
@@ -23,7 +22,6 @@ inputfile.close()
 LIST_OF_ADDRESSES = list(set(LIST_OF_ADDRESSES))
 
 
-print(LIST_OF_ADDRESSES)
 with open('AccountsRecievingRansom.csv', 'w') as csvfile:
     RESULTS_WRITER = csv.writer(
         csvfile,
@@ -36,15 +34,19 @@ with open('AccountsRecievingRansom.csv', 'w') as csvfile:
                              'total BTC sent',
                              'final BTC balance'])
     for ADDRESS in tqdm(LIST_OF_ADDRESSES):
-        #BATCH += ADDRESS + '|'
-        with requests.get('https://blockchain.info/rawaddr/' + ADDRESS, stream=True) as result:
-            if result.status_code == 200:
-                data = result.json()
-                RESULTS_WRITER.writerow([data['address'],
-                                         data['n_tx'],
-                                         data['total_received']/100000000.00,
-                                         data['total_sent']/1000000000.00,
-                                         data['final_balance']/1000000000.00])
-            else:
-                print('HTTP Response is: ' + str(result.status_code))
+        s = requests.Session()
+        s.auth = ('concinnity@cantab.net', '3158ef3d-593d-4c36-9c3f-c1ac5c1effda')
+        try:
+            with s.get('https://blockchain.info/rawaddr/' + ADDRESS, stream=True) as result:
+                if result.status_code == 200:
+                    data = result.json()
+                    RESULTS_WRITER.writerow([data['address'],
+                                             data['n_tx'],
+                                             data['total_received']/100000000.00,
+                                             data['total_sent']/1000000000.00,
+                                             data['final_balance']/1000000000.00])
+                else:
+                    print('HTTP Response is: ' + str(result.status_code))
+        except Exception as E:
+            print(E)
 csvfile.close()

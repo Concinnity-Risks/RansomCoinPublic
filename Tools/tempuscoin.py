@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # Copyleft 2019 Eireann Leverett of Concinnity Risks
-#
+# Conversion code adapted from rommelfs wonderful misp_btc.py code
+# https://github.com/rommelfs/misp_btc
+# Hat tip to you sir
 # File name tempuscoin.py
 # written by eireann.leverett@cantab.net
 import requests
@@ -128,8 +130,8 @@ with open('TemporalRansoms.csv', 'w') as csvfile:
                                                     ADDRESS,
                                                     datetime.datetime.fromtimestamp(int(tx['time'])),
                                                     input['prev_out']['value']/100000000.00,
-                                                    '{0:.2f}'.format(conversions[1]).rstrip('0'),
-                                                    '{0:.2f}'.format(conversions[0]).rstrip('0')])
+                                                    '{0:.2f}'.format(conversions[1]),
+                                                    '{0:.2f}'.format(conversions[0])])
                 else:
                     print('HTTP Response is: ' + str(result.status_code))
                     time.sleep(3)
