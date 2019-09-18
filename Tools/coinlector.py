@@ -17,7 +17,7 @@ import sha3
 import tlsh
 import magic
 import pdftotext
-import monerobase58
+import monero
 from binascii import hexlify,unhexlify
 #Not strictly needed, but shows progress bar on large sample sets
 from tqdm import tqdm
@@ -108,7 +108,7 @@ def neo_verify( neo_match ):
 
 def xmr_verify( xmr_match ):
     try:
-        pubAddrHex = monerobase58.decode(xmr_match.decode("utf8"))
+        pubAddrHex = monero.base58.decode(xmr_match.decode("utf8"))
         pubAddrChksum = pubAddrHex[-8:]
         pubAddrForHash = pubAddrHex[:-8]
         #print(pubAddrChksum)
@@ -124,7 +124,7 @@ def xmr_verify( xmr_match ):
             #print("False: %s" % xmr_match)
             return False
     except Exception as E:
-        #print("Exception: %s" % E)
+        print("Exception: %s" % E)
         return False
 
 # Section for regexes of interest as Indicators of Compromise
