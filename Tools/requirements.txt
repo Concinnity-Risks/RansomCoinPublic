@@ -6,3 +6,4 @@ python-magic==0.4.15
 pdftotext==2.1.2
 pymisp==2.4.92.1
 requests==2.22.0
+monero-python==0.5.4
