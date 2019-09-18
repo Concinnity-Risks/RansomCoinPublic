@@ -37,15 +37,14 @@ with open('AccountsRecievingRansom.csv', 'w') as csvfile:
                              'final BTC balance'])
     for ADDRESS in tqdm(LIST_OF_ADDRESSES):
         #BATCH += ADDRESS + '|'
-        result = requests.get('https://blockchain.info/rawaddr/' + ADDRESS)
-        if result.status_code == 200:
-            data = result.json()
-            RESULTS_WRITER.writerow([data['address'],
-                                     data['n_tx'],
-                                     data['total_received']/100000000,
-                                     data['total_sent']/1000000000,
-                                     data['final_balance']/1000000000])
-        else:
-            print('HTTP Response is: ' + str(result.status_code))
+        with requests.get('https://blockchain.info/rawaddr/' + ADDRESS, stream=True) as result:
+            if result.status_code == 200:
+                data = result.json()
+                RESULTS_WRITER.writerow([data['address'],
+                                         data['n_tx'],
+                                         data['total_received']/100000000.00,
+                                         data['total_sent']/1000000000.00,
+                                         data['final_balance']/1000000000.00])
+            else:
+                print('HTTP Response is: ' + str(result.status_code))
 csvfile.close()
-#print json.dumps(result.json(), indent=4, sort_keys=True)
