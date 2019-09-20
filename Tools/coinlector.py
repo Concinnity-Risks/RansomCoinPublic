@@ -124,7 +124,7 @@ def xmr_verify( xmr_match ):
             #print("False: %s" % xmr_match)
             return False
     except Exception as E:
-        print("Exception: %s" % E)
+        #print("Exception: %s" % E)
         return False
 
 # Section for regexes of interest as Indicators of Compromise
@@ -170,7 +170,7 @@ with open('Ransomware.csv', 'w') as csvfile:
     RESULTS_WRITER.writerow(["tlsh","md5","sha1","sha256","filename","filetype","Class of Observable","Potential Monetisation Vector"])
     for filename in tqdm(os.listdir(os.getcwd())):
         #Don't analyse any of the files we produce/use
-        if filename == 'Ransomware.csv' or filename == 'coinlector.py' or filename == 'AccountsRecievingRansom.csv' or filename == 'chasingcoin.py' or filename == 'eventcoin.py' or os.path.isdir(filename):
+        if filename == 'Ransomware.csv' or filename == 'coinlector.py' or filename == 'AccountsRecievingRansom.csv' or filename == 'chasingcoin.py' or filename == 'eventcoin.py' or 'TemporalRansoms.csv' or os.path.isdir(filename):
             FILES_WE_PRODUCE += 1
             pass
         else:
