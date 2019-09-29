@@ -159,7 +159,7 @@ except OSError:
 COINS_COLLECTED = 0
 
 #This variable helps us get our yield callculations correct
-FILES_WE_PRODUCE = 0
+FILES_WE_PRODUCE = 1 #because at least coinlector.py is in here
 
 with open('Ransomware.csv', 'w') as csvfile:
     RESULTS_WRITER = csv.writer(
@@ -275,5 +275,5 @@ with open('Ransomware.csv', 'w') as csvfile:
                              str(100 *
                                 COINS_COLLECTED /
                                 (len(os.listdir(os.getcwd()))-FILES_WE_PRODUCE)) +
-                             "%", " Across", len(os.listdir(os.getcwd()))-FILES_WE_PRODUCE, "samples", "", "", "End of File"])
+                             "%", " Across", len(os.listdir(os.getcwd())), "samples", "", "", "End of File"])
     csvfile.close()
