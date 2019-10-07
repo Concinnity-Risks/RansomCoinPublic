@@ -95,7 +95,7 @@ The results are output to a filed called AccountsRecievingRansom.csv which displ
 less AccountsRecievingRansom.csv
 ```
 
-![Accounts Receiving Ransom CSV](/Assets/Images/accounts-receiving-ransom.png.png)
+![Accounts Receiving Ransom CSV](/Assets/Images/accounts-receiving-ransom.png)
 
 ### Tempuscoin.py
 tempuscoin.py outputs a list of timestamped ransom transactions. The file TemporalRansoms.csv is created showing the sending and receiving Bitcoin addresses, the amount in BTC and its equivalent value in EUR, USD at the time of the transaction.
