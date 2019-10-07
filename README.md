@@ -29,17 +29,19 @@ The following commands can be run from the "Tools" folder to analyse malware sam
 
 
 ### Coinlector.py
-Coinlector  After running, results are output to a file in the same directory called Ransomware.csv.
+After running coinlector.py the results are output to a file in the same directory called Ransomware.csv
 
 ```
-$ python3 coinlector.py
+python3 coinlector.py
 ```
 
 View the results by running 
 
 ```
-$ less Ransomware.csv
+less Ransomware.csv
 ```
+
+![Ransomware CSV](/Assets/Images/ransomware.png)
 
 Currently we are testing for:
 
@@ -61,7 +63,7 @@ Currently we are testing for:
 View URLs, email addresses, and cryptocurrency addresses by running the following grep commands.
 
 ```
-$ less Ransomware.csv | grep URL
+less Ransomware.csv | grep URL
 ```
 
 ```
@@ -93,6 +95,7 @@ The results are output to a filed called AccountsRecievingRansom.csv which displ
 less AccountsRecievingRansom.csv
 ```
 
+![Accounts Receiving Ransom CSV](/Assets/Images/accounts-receiving-ransom.png.png)
 
 ### Tempuscoin.py
 tempuscoin.py outputs a list of timestamped ransom transactions. The file TemporalRansoms.csv is created showing the sending and receiving Bitcoin addresses, the amount in BTC and its equivalent value in EUR, USD at the time of the transaction.
@@ -105,6 +108,8 @@ View the results by running.
 ```
 less TemporalRansoms.csv
 ```
+
+![Temporal Ransoms CSV](/Assets/Images/temporal-ransoms.png)
 
 ## Consider Donating
 
