@@ -38,15 +38,41 @@ for line in lines:
                 event_dict = misp.get(event_id)['Event']
                 event = MISPEvent()
                 event.from_dict(**event_dict)
-                event.add_attribute(type='md5', category='Artifacts dropped', value=attrs[0], disable_correlation=False, to_ids=False, proposal=False, distribution=5)
-                event.add_attribute(type='sha1', category='Artifacts dropped', value=attrs[1], disable_correlation=False, to_ids=False, proposal=False, distribution=5)
-                event.add_attribute(type='sha256', category='Artifacts dropped', value=attrs[2], disable_correlation=False, to_ids=False, proposal=False, distribution=5)
-                event.add_attribute(type='btc', category='Financial fraud', value=attrs[5], disable_correlation=False, to_ids=False, proposal=False, distribution=5)
+                event.add_attribute(type='md5', category='Artifacts dropped', value=attrs[1], disable_correlation=False, to_ids=False, proposal=False, distribution=5)
+                event.add_attribute(type='sha1', category='Artifacts dropped', value=attrs[2], disable_correlation=False, to_ids=False, proposal=False, distribution=5)
+                event.add_attribute(type='sha256', category='Artifacts dropped', value=attrs[3], disable_correlation=False, to_ids=False, proposal=False, distribution=5)
+                event.add_attribute(type='btc', category='Financial fraud', value=attrs[7], disable_correlation=False, to_ids=False, proposal=False, distribution=5)
             else:
                 print("Adding to Event id: %s" % event_id)
                 event_dict = misp.get(event_id)['Event']
                 event = MISPEvent()
                 event.from_dict(**event_dict)
-                event.add_attribute(type='btc', category = 'Financial fraud', value=attrs[5], disable_correlation=False, to_ids=False, proposal=False, distribution=5)
+                event.add_attribute(type='btc', category = 'Financial fraud', value=attrs[7], disable_correlation=False, to_ids=False, proposal=False, distribution=5)
+            event_dict = misp.update(event)
+    if "XMR Address" in line:
+            attrs = line.split(",")
+            if lasthash != attrs[3]:
+                lasthash = attrs[3]
+                event_obj = MISPEvent()
+                event_obj.distribution = 1
+                event_obj.threat_level_id = 3
+                event_obj.analysis = 1
+                event_obj.info = "RansomCoin Ransomware Survey "+attrs[3]
+                event = misp.add_event(event_obj)
+                event_id = event["Event"]["id"]
+                print("Creating Event id: %s" % event_id)
+                event_dict = misp.get(event_id)['Event']
+                event = MISPEvent()
+                event.from_dict(**event_dict)
+                event.add_attribute(type='md5', category='Artifacts dropped', value=attrs[1], disable_correlation=False, to_ids=False, proposal=False, distribution=5)
+                event.add_attribute(type='sha1', category='Artifacts dropped', value=attrs[2], disable_correlation=False, to_ids=False, proposal=False, distribution=5)
+                event.add_attribute(type='sha256', category='Artifacts dropped', value=attrs[3], disable_correlation=False, to_ids=False, proposal=False, distribution=5)
+                event.add_attribute(type='xmr', category='Financial fraud', value=attrs[7], disable_correlation=False, to_ids=False, proposal=False, distribution=5)
+            else:
+                print("Adding to Event id: %s" % event_id)
+                event_dict = misp.get(event_id)['Event']
+                event = MISPEvent()
+                event.from_dict(**event_dict)
+                event.add_attribute(type='xmr', category = 'Financial fraud', value=attrs[7], disable_correlation=False, to_ids=False, proposal=False, distribution=5)
             event_dict = misp.update(event)
 csvfile.close()
