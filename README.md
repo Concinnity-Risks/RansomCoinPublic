@@ -96,6 +96,10 @@ less TemporalRansoms.csv
 
 ![Temporal Ransoms CSV](/Assets/Images/temporal-ransoms.png)
 
+### Eventcoin.py
+
+This code will probably need to be altered to be made usable with your own MISP instance. It uses PyMISP to create events from the Ransomware.csv file, and groups of events share the same name. The default is to create events that are not published, and then to add details by hand before publishing. YMMV.
+
 ## Consider Donating
 
 We accept anonymous donations towards our software development on this project via a Monero address: 
