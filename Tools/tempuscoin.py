@@ -118,7 +118,7 @@ with open('TemporalRansoms.csv', 'w') as csvfile:
                              'BTC','EUR','USD'])
     for ADDRESS in tqdm(LIST_OF_ADDRESSES):
         s = requests.Session()
-        s.auth = ('email@here', 'API-KEY-FOR-BLOCKCHAIN.INFO')
+        s.auth = ('get@your.own', 'API KEY')
         try:
             with s.get('https://blockchain.info/rawaddr/' + ADDRESS, stream=True) as result:
                 if result.status_code == 200:
