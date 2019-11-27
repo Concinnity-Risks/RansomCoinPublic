@@ -281,7 +281,15 @@ with open('Ransomware.csv', 'w') as csvfile:
     csvfile.close()
 
 def main():
-    def b58decode_check(potential_address)
+    print('Coinlector started successfully')
 
 if __name__=='__main__':
    main()
+
+'''
+def main():
+    b58decode_check()
+
+if __name__=='__main__':
+   main()
+'''
