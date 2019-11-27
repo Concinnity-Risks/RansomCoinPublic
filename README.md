@@ -84,6 +84,7 @@ less Ransomware.csv | grep XMR
 
 The same command can be used to search for other cryptocurrencies using the abbreviations in the list above.
 
+<<<<<<< HEAD
 ### Chasingcoin.py
 chasingcoin.py gathers basic information on amounts recieved in Bitcoin by accounts gathered, based on the output of coinlector.py.
 
@@ -99,6 +100,8 @@ less AccountsRecievingRansom.csv
 
 ![Accounts Receiving Ransom CSV](/Assets/Images/accounts-receiving-ransom.png)
 
+=======
+>>>>>>> da53435e3fb2ca78950c692f73acd3773c0be2fc
 ### Tempuscoin.py
 tempuscoin.py outputs a list of timestamped ransom transactions. The file TemporalRansoms.csv is created showing the sending and receiving Bitcoin addresses, the amount in BTC and its equivalent value in EUR, USD at the time of the transaction.
 
@@ -112,6 +115,10 @@ less TemporalRansoms.csv
 ```
 
 ![Temporal Ransoms CSV](/Assets/Images/temporal-ransoms.png)
+
+### Eventcoin.py
+
+This code will probably need to be altered to be made usable with your own MISP instance. It uses PyMISP to create events from the Ransomware.csv file, and groups of events share the same name. The default is to create events that are not published, and then to add details by hand before publishing. YMMV.
 
 ## Consider Donating
 
