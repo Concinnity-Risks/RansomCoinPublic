@@ -1,1 +1,22 @@
-.DS_Store
+# Environments 
+.env 
+.venv 
+env/ 
+venv/ 
+*venv/
+ENV/ 
+env.bak/ 
+venv.bak/ 
+
+# Visual Studio Code 
+.vscode/* 
+.vscode/
+.vscode/settings.json 
+!.vscode/settings.json 
+!.vscode/tasks.json 
+!.vscode/launch.json 
+!.vscode/extensions.json 
+.history
+
+# Other
+*.DS_Store

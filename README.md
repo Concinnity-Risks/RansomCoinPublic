@@ -84,24 +84,6 @@ less Ransomware.csv | grep XMR
 
 The same command can be used to search for other cryptocurrencies using the abbreviations in the list above.
 
-<<<<<<< HEAD
-### Chasingcoin.py
-chasingcoin.py gathers basic information on amounts recieved in Bitcoin by accounts gathered, based on the output of coinlector.py.
-
-```
-python3 chasingcoin.py
-```
-
-The results are output to a filed called AccountsRecievingRansom.csv which displays the wallet address, number of transactions, total of Bitcoin received, total Bitcoin sent and the final wallet balance. View the results by running.
-
-```
-less AccountsRecievingRansom.csv
-```
-
-![Accounts Receiving Ransom CSV](/Assets/Images/accounts-receiving-ransom.png)
-
-=======
->>>>>>> da53435e3fb2ca78950c692f73acd3773c0be2fc
 ### Tempuscoin.py
 tempuscoin.py outputs a list of timestamped ransom transactions. The file TemporalRansoms.csv is created showing the sending and receiving Bitcoin addresses, the amount in BTC and its equivalent value in EUR, USD at the time of the transaction.
 
