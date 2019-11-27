@@ -279,3 +279,9 @@ with open('Ransomware.csv', 'w') as csvfile:
                                 (len(os.listdir(os.getcwd()))-FILES_WE_PRODUCE)) +
                              "%", " Across", len(os.listdir(os.getcwd())), "samples", "", "", "End of File"])
     csvfile.close()
+
+def main():
+    def b58decode_check(potential_address)
+
+if __name__=='__main__':
+   main()
