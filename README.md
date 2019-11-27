@@ -25,6 +25,8 @@ sudo apt-get install python3-pip
 
 
 ## Usage instructions
+A tutorial video is available: https://youtu.be/3pUDh5HvqVI
+
 The following commands can be run from the "Tools" folder to analyse malware samples located in this directory. This will run the code across all files in the directoy and provide feedback on the estimated time to completion via TQDM. You will need write access for a file called Ransomware.csv in the directory you are working in (which contains the results). It should be possible to run the code across read only malware files though, so only Ransomware.csv need write access.
 
 
@@ -86,7 +88,7 @@ The same command can be used to search for other cryptocurrencies using the abbr
 chasingcoin.py gathers basic information on amounts recieved in Bitcoin by accounts gathered, based on the output of coinlector.py.
 
 ```
-$ python3 chasingcoin.py
+python3 chasingcoin.py
 ```
 
 The results are output to a filed called AccountsRecievingRansom.csv which displays the wallet address, number of transactions, total of Bitcoin received, total Bitcoin sent and the final wallet balance. View the results by running.
