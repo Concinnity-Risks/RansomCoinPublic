@@ -22,6 +22,12 @@ from binascii import hexlify,unhexlify
 #Not strictly needed, but shows progress bar on large sample sets
 from tqdm import tqdm
 
+def main():
+    print('Coinlector started successfully')
+
+if __name__=='__main__':
+   main()
+
 # Address Validation checks
 #All THIS SHOULD BE REFACTORED TO BE PASS IN THE TICKER AFTER THE REGEX SUCCEEDS
 def b58decode_check(potential_address):
@@ -279,12 +285,6 @@ with open('Ransomware.csv', 'w') as csvfile:
                                 (len(os.listdir(os.getcwd()))-FILES_WE_PRODUCE)) +
                              "%", " Across", len(os.listdir(os.getcwd())), "samples", "", "", "End of File"])
     csvfile.close()
-
-def main():
-    print('Coinlector started successfully')
-
-if __name__=='__main__':
-   main()
 
 '''
 def main():
