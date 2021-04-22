@@ -25,7 +25,7 @@ sudo apt-get install python3-pip
 
 
 ## Usage instructions
-A tutorial video is available: https://youtu.be/3pUDh5HvqVI
+A tutorial video is available: https://asciinema.org/a/408350. If that URL does not work, try: https://youtu.be/3pUDh5HvqVI
 
 The following commands can be run from the "Tools" folder to analyse malware samples located in this directory. This will run the code across all files in the directoy and provide feedback on the estimated time to completion via TQDM. You will need write access for a file called Ransomware.csv in the directory you are working in (which contains the results). It should be possible to run the code across read only malware files though, so only Ransomware.csv need write access.
 
