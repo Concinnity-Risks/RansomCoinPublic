@@ -6,6 +6,8 @@
 # Python 3 compatible version
 '''Coinlector is a tool to autoextract common monetisation format Indicators of Compromise from ransomware binaries.'''
 import os
+import glob
+import subprocess
 import re
 import csv
 import hashlib
@@ -16,7 +18,7 @@ import cashaddress
 import sha3
 import tlsh
 import magic
-import pdftotext
+#import pdftotext
 import monero
 from binascii import hexlify,unhexlify
 #Not strictly needed, but shows progress bar on large sample sets
@@ -161,6 +163,48 @@ COINS_COLLECTED = 0
 #This variable helps us get our yield callculations correct
 FILES_WE_PRODUCE = 1 #because at least coinlector.py is in here
 
+# Decompile APK and add to list of files to analyse
+def apk_handler(filename):
+    print("Apk file found.")
+    tools_dir = os.path.dirname(os.path.abspath(__file__))
+    apktool_path = os.path.join(tools_dir, 'apktool')
+    dex2jar_path = os.path.join(tools_dir, 'd2j-dex2jar.sh')
+
+    # Get name of apk file
+    for apk_file in glob.glob(os.path.join(tools_dir, '*.apk')):
+        print(apk_file)
+        print("Attempting to decompile " + apk_file)
+        decompiled_apk = apk_file + "_decompiled"
+        subprocess.call([apktool_path, 'd', apk_file, '-o', decompiled_apk, '-f'])
+        print("Saving decompiled apk to " + decompiled_apk)
+        print("Searching directories for dex files")
+
+        # Check for dex files in decompiled apk
+        for root, dirs, files in os.walk(decompiled_apk):
+            for dex_file in files:
+                # Run d2j-dex2jar.sh & output jar files to decompiled_dir
+                if dex_file.endswith(".dex"):
+                    print("Found dex file: " + dex_file)
+                    apk_jar = decompiled_apk + dex_file + ".jar"
+                    try:
+                        print("Converting dex to jar")
+                        subprocess.call(
+                            "sh" + " " + dex2jar_path + " " + dex_file + " -o " + apk_jar)
+                    except Exception as e:
+                        print('Dex2jar could not convert the files. : ' + str(e))
+
+        # Recursively analyse files
+        apk_list = []
+        for root, subdirs, files in os.walk(decompiled_apk):
+            for subdir in subdirs:
+                print("Found subdirectory: " + subdir)
+                for file_name in files:
+                    file_namepath = os.path.join(root, file_name)
+                    print("Adding file to list: " + file_namepath)
+                    apk_list.append(file_namepath)
+        #print(apk_list)
+        return apk_list
+
 with open('Ransomware.csv', 'w') as csvfile:
     RESULTS_WRITER = csv.writer(
         csvfile,
@@ -168,12 +212,13 @@ with open('Ransomware.csv', 'w') as csvfile:
         quotechar='"',
         quoting=csv.QUOTE_MINIMAL)
     RESULTS_WRITER.writerow(["tlsh","md5","sha1","sha256","filename","filetype","Class of Observable","Potential Monetisation Vector"])
-    for filename in tqdm(os.listdir(os.getcwd())):
+    todo = os.listdir(os.getcwd())
+    for filename in tqdm(todo):
         #Don't analyse any of the files we produce/use
-        if filename == 'Ransomware.csv' or filename == 'coinlector.py' or filename == 'AccountsRecievingRansom.csv' or filename == 'chasingcoin.py' or filename == 'eventcoin.py' or filename == 'TemporalRansoms.csv':
+        if filename == 'Ransomware.csv' or filename == 'coinlector.py' or filename == 'AccountsRecievingRansom.csv' or filename == 'chasingcoin.py' or filename == 'eventcoin.py' or filename == 'tempuscoin.py' or filename == 'TemporalRansoms.csv' or filename == 'apktool' or filename == 'apktool.jar' or filename == 'apktool.yml' or filename == 'd2j-dex2jar.sh' or filename == 'd2j_invoke.sh' or filename == 'requirements.txt':
             FILES_WE_PRODUCE += 1
             pass
-        elif os.path.isdir(filename):
+        elif os.path.isdir(filename or venv):
             pass
         else:
             try:
@@ -183,10 +228,16 @@ with open('Ransomware.csv', 'w') as csvfile:
                 with open(filename, mode='rb') as f:
                     if 'PDF document' in filetype:
                         try:
-                            pdf = pdftotext.PDF(f)
+                            #pdf = pdftotext.PDF(f)
                             readFile = bytes("\n\n".join(pdf),'UTF-8')
                         except:
                             readFile = f.read()
+                    # ===== Start APK handler =====
+                    elif filename.endswith('.apk'):
+                        filelist = apk_handler(filename)
+                        todo = todo + filelist
+                        print("printing todo" + str(todo))
+                        readFile = f.read()
                     else:
                         readFile = f.read()
                     tlshash = tlsh.hash(readFile)
