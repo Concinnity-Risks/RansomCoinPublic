@@ -18,7 +18,7 @@ import cashaddress
 import sha3
 import tlsh
 import magic
-#import pdftotext
+import pdftotext
 import monero
 from binascii import hexlify,unhexlify
 #Not strictly needed, but shows progress bar on large sample sets
@@ -214,7 +214,7 @@ with open('Ransomware.csv', 'w') as csvfile:
     RESULTS_WRITER.writerow(["tlsh","md5","sha1","sha256","filename","filetype","Class of Observable","Potential Monetisation Vector"])
     todo = os.listdir(os.getcwd())
     for filename in tqdm(todo):
-        #Don't analyse any of the files we produce/use
+        # Don't analyse any of the files we produce/use
         if filename == 'Ransomware.csv' or filename == 'coinlector.py' or filename == 'AccountsRecievingRansom.csv' or filename == 'chasingcoin.py' or filename == 'eventcoin.py' or filename == 'tempuscoin.py' or filename == 'TemporalRansoms.csv' or filename == 'apktool' or filename == 'apktool.jar' or filename == 'apktool.yml' or filename == 'd2j-dex2jar.sh' or filename == 'd2j_invoke.sh' or filename == 'requirements.txt':
             FILES_WE_PRODUCE += 1
             pass
@@ -223,12 +223,12 @@ with open('Ransomware.csv', 'w') as csvfile:
         else:
             try:
                 filetype = magic.from_file(filename)
-                #Strip the commas from the strings so we don't break our own csv output formatting
+                # Strip the commas from the strings so we don't break our own csv output formatting
                 filetype = filetype.replace(',', '')
                 with open(filename, mode='rb') as f:
                     if 'PDF document' in filetype:
                         try:
-                            #pdf = pdftotext.PDF(f)
+                            pdf = pdftotext.PDF(f)
                             readFile = bytes("\n\n".join(pdf),'UTF-8')
                         except:
                             readFile = f.read()
