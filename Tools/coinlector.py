@@ -218,7 +218,7 @@ with open('Ransomware.csv', 'w') as csvfile:
         if filename == 'Ransomware.csv' or filename == 'coinlector.py' or filename == 'AccountsRecievingRansom.csv' or filename == 'chasingcoin.py' or filename == 'eventcoin.py' or filename == 'tempuscoin.py' or filename == 'TemporalRansoms.csv' or filename == 'apktool' or filename == 'apktool.jar' or filename == 'apktool.yml' or filename == 'd2j-dex2jar.sh' or filename == 'd2j_invoke.sh' or filename == 'requirements.txt':
             FILES_WE_PRODUCE += 1
             pass
-        elif os.path.isdir(filename or venv):
+        elif os.path.isdir(filename):
             pass
         else:
             try:

@@ -20,6 +20,8 @@ venv.bak/
 
 # Other
 *.DS_Store
-
 .idea/
 .idea/*
+*.idea/
+*.apk
+/venv
